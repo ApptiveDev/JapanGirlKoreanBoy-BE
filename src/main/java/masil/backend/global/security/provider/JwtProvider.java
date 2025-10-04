@@ -28,7 +28,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class JwtProvider {
     private static final Logger log = LoggerFactory.getLogger(JwtProvider.class);
-    private static final String ROLES = "roles";
     private static final String NAME = "name";
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24시간
 
@@ -45,17 +44,16 @@ public class JwtProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createToken(final String userPk, final List<String> roles, final String name) {
+    public String createToken(final String userPk, final String name) {
         final Date now = new Date();
         final Date expiration = new Date(now.getTime() + EXPIRATION_TIME);
 
         return Jwts.builder()
                 .subject(userPk)
-                .claim(ROLES, roles)
                 .claim(NAME, name)
                 .issuedAt(now)
-                .expiration(expiration)  // 만료시간 추가
-                .signWith(key)  // SignatureAlgorithm 제거
+                .expiration(expiration)
+                .signWith(key)
                 .compact();
     }
 

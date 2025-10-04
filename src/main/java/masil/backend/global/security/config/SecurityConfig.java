@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .formLogin(FormLoginConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/sign-up/**", "/sign-in/**", "/oauth/**").permitAll()
-                        .anyRequest().hasAnyRole("회원", "관리자", "팀장", "팀원")
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(exceptions -> exceptions
                         .accessDeniedHandler(customAccessDeniedHandler)
