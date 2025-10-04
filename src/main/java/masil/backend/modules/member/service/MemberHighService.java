@@ -35,16 +35,13 @@ public class MemberHighService {
                 encodedPassword
         );
 
-        final String token = jwtProvider.createToken(
-                String.valueOf(savedMember.getId()),
-                savedMember.getName()
-        );
+        getToken(savedMember.getId(), savedMember.getName());
     }
 
     public SignInResponse signIn(final SignInRequest signInRequest) {
         final Member member =  memberLowService.getValidateExistMemberByEmail(signInRequest.email());
         checkCorrectPassword(member.getPassword(), signInRequest.password());
-        final String token = jwtProvider.createToken(String.valueOf(member.getId()), member.getName());
+        final String token = getToken(member.getId(), member.getName());
         return new SignInResponse(member, token);
     }
 
@@ -52,5 +49,9 @@ public class MemberHighService {
         if (!passwordEncoder.matches(inputPassword, savePassword)) {
             throw new MemberException(CANNOT_MATCH_PASSWORD);
         }
+    }
+
+    private String getToken(final Long memberId, final String name) {
+        return jwtProvider.createToken(String.valueOf(memberId), name);
     }
 }
