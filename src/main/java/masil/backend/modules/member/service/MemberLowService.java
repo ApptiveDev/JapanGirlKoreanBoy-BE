@@ -23,16 +23,21 @@ public class MemberLowService {
     }
 
     @Transactional
-    public Member saveMember(final String name, final String email, final String password) {
+    public void saveMember(final String name, final String email, final String password) {
         final Member member = Member.builder()
                 .name(name)
                 .email(email)
                 .password(password)
                 .build();
 
-        return memberRepository.save(member);
+        memberRepository.save(member);
     }
 
     public Member getValidateExistMemberByEmail(final String email) {
         return memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
-    }}
+    }
+
+    public Member getValidateExistMemberById(final Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
+    }
+}

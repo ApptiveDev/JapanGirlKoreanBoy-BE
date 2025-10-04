@@ -22,9 +22,6 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("is_deleted = false")
 @SQLDelete(sql = "UPDATE member SET is_deleted = true where id = ?")
 public class Member extends BaseEntity {
-
-    private static final int MAX_ROLE_NAME_LENGTH = 20;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -53,7 +50,7 @@ public class Member extends BaseEntity {
         this.password = newPassword;
     }
 
-    public boolean isEqual(final String newPassword) {
+    public boolean isPasswordEqual(final String newPassword) {
         return this.password.equals(newPassword);
     }
 }

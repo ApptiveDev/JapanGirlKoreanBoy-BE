@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import masil.backend.global.security.provider.JwtProvider;
 import masil.backend.modules.member.dto.request.SignInRequest;
 import masil.backend.modules.member.dto.request.SignUpRequest;
+import masil.backend.modules.member.dto.response.MyInfoResponse;
 import masil.backend.modules.member.dto.response.SignInResponse;
 import masil.backend.modules.member.entity.Member;
 import masil.backend.modules.member.exception.MemberException;
@@ -41,6 +42,12 @@ public class MemberHighService {
         checkCorrectPassword(member.getPassword(), signInRequest.password());
         final String token = getToken(member.getId(), member.getName());
         return new SignInResponse(member, token);
+    }
+
+    @Transactional(readOnly = true)
+    public MyInfoResponse getMyInfo(final Long memberId) {
+        final Member member = memberLowService.getValidateExistMemberById(memberId);
+        return new MyInfoResponse(member);
     }
 
     private void checkCorrectPassword(final String savePassword, final String inputPassword) {
