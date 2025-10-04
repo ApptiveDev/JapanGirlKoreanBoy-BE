@@ -29,13 +29,11 @@ public class MemberHighService {
 
         memberLowService.checkIsDuplicateEmail(signUpRequest.email());
 
-        final Member savedMember = memberLowService.saveMember(
+        memberLowService.saveMember(
                 signUpRequest.name(),
                 signUpRequest.email(),
                 encodedPassword
         );
-
-        getToken(savedMember.getId(), savedMember.getName());
     }
 
     public SignInResponse signIn(final SignInRequest signInRequest) {

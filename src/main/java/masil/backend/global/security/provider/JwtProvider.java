@@ -14,14 +14,13 @@ import java.util.Date;
 import java.util.List;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
-import masil.backend.modules.member.service.MemberDetailsService;
+import masil.backend.global.security.dto.MemberDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -35,8 +34,6 @@ public class JwtProvider {
     private String secretKey;
 
     private SecretKey key;
-
-    private final MemberDetailsService memberDetailsService;
 
     @PostConstruct
     protected void init() {
@@ -58,12 +55,19 @@ public class JwtProvider {
     }
 
     public Authentication getAuthentication(final String token) {
-        final String memberId = extractSubject(token);
-        final UserDetails userDetails = memberDetailsService.loadUserByUsername(memberId);
+        final Claims claims = getClaim(token);
+        final String memberId = claims.getSubject();
+        final String name = claims.get(NAME, String.class);
+
+        final MemberDetails memberDetails = new MemberDetails(
+                Long.parseLong(memberId),
+                name
+        );
+
         return new UsernamePasswordAuthenticationToken(
-                userDetails,
+                memberDetails,
                 null,
-                userDetails.getAuthorities()
+                List.of()
         );
     }
 
@@ -97,15 +101,11 @@ public class JwtProvider {
     }
 
     private Claims getClaim(final String token) {
-        try {
-            return Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
-        }
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     private String extractSubject(final String token) {
