@@ -32,6 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-### application ###
+### application properties ###
 application-secret.properties
 application-monitor.properties
