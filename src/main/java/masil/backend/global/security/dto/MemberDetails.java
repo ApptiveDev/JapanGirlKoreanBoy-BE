@@ -24,5 +24,4 @@ public record MemberDetails(
     public String getUsername() {
         return username;
     }
-
 }
