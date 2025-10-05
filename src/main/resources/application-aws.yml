@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: backend
+  
+  # AWS RDS Database Configuration (Production)
+  datasource:
+    url: ${DB_URL:jdbc:mysql://your-rds-endpoint:3306/your-database}
+    username: ${DB_USERNAME:your-username}
+    password: ${DB_PASSWORD:your-password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  # JPA Configuration for Production
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: validate  # Production에서는 validate 사용
+    show-sql: false
+  
+  # OAuth2 Client Configuration (AWS Parameter Store에서 가져옴)
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - openid
+              - profile
+              - email
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            authorization-grant-type: authorization_code
+            client-authentication-method: client_secret_post
+
+# JWT Configuration (AWS Parameter Store에서 가져옴)
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: 900000  # 15 minutes
+  refresh-token-expiration: 604800000  # 7 days
+
+# AWS Parameter Store Configuration
+aws:
+  parameterstore:
+    enabled: true
+    name: /myapp/config
+    prefix: /config
+    profile-separator: _
+    fail-fast: true
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# Logging Configuration for Production
+logging:
+  level:
+    masil.backend: INFO
+    org.springframework.security: WARN
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN

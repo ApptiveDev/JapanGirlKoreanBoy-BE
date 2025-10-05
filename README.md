@@ -1,9 +1,16 @@
- # (프로젝트명)
-(개요, 프로젝트 소개)
+# Spring Boot 인증 시스템
 
- ## 📝 주요기능
+Spring Boot 3.2 + Java 17 기반의 보안 인증 시스템으로, 로컬 로그인과 Google OAuth2 로그인을 모두 지원합니다.
 
- ## 🔨 기술스택 
+## 📝 주요기능
+
+- **로컬 인증**: 이메일/비밀번호 회원가입 및 로그인
+- **Google OAuth2**: Google 계정으로 소셜 로그인
+- **JWT 토큰**: Access Token과 Refresh Token을 통한 보안 인증
+- **AWS 통합**: Parameter Store를 통한 시크릿 관리
+- **PKCE 지원**: OAuth2 보안 강화
+
+## 🔨 기술스택
 <!-- 
 (백엔드, 프론트, 협업에 사용한 툴, 라이브러리, 프레임워크)
 
@@ -17,27 +24,164 @@
 
 (백엔드, 프론트, 협업에 사용한 툴, 라이브러리, 프레임워크)
 
+![spring](https://img.shields.io/badge/spring_boot-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![java](https://img.shields.io/badge/java-007396?style=for-the-badge&logo=openjdk&logoColor=white)
+![maven](https://img.shields.io/badge/maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
+![h2](https://img.shields.io/badge/h2-1E88E5?style=for-the-badge&logo=h2&logoColor=white)
+
+![jwt](https://img.shields.io/badge/jwt-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
+![oauth2](https://img.shields.io/badge/oauth2-EB5424?style=for-the-badge&logo=auth0&logoColor=white)
+![aws](https://img.shields.io/badge/aws-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)
+![google](https://img.shields.io/badge/google_oauth-4285F4?style=for-the-badge&logo=google&logoColor=white)
+
 ![intellij](https://img.shields.io/badge/intellij_idea-000000?style=for-the-badge&logo=intellijidea&logoColor=white)
-![vscode](https://img.shields.io/badge/vscode-000000?style=for-the-badge&logo=vscode&logoColor=white)
-![androidstudio](https://img.shields.io/badge/android_studio-3DDC84?style=for-the-badge&logo=androidstudio&logoColor=white)  
-
-![docker](https://img.shields.io/badge/docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![nginx](https://img.shields.io/badge/nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
-![redis](https://img.shields.io/badge/redis-FF4438?style=for-the-badge&logo=redis&logoColor=white)
-![github-action](https://img.shields.io/badge/github_actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
-
-![react](https://img.shields.io/badge/react-61DAFB?style=for-the-badge&logo=react&logoColor=white)
-![jetpack-compose](https://img.shields.io/badge/jetpack_compose-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white)
-![spring](https://img.shields.io/badge/spring-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
+![github](https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white)
 
 | 스택 | 설명 | 용도 |
 |-----|-----|-----|
-| 스택1 | 스택에 대한 설명 | 프로젝트 쓰임새 |
-| ... | ... | ... |
+| Spring Boot 3.2 | Java 기반 웹 프레임워크 | 백엔드 API 서버 |
+| Spring Security | 보안 프레임워크 | 인증 및 권한 관리 |
+| Spring Data JPA | 데이터 액세스 레이어 | 데이터베이스 연동 |
+| JWT (jjwt) | JSON Web Token | 토큰 기반 인증 |
+| OAuth2 Client | OAuth2 클라이언트 | Google 소셜 로그인 |
+| H2 Database | 인메모리 데이터베이스 | 개발/테스트 환경 |
+| AWS Parameter Store | 시크릿 관리 서비스 | 민감한 정보 저장 |
+| BCrypt | 비밀번호 해싱 | 비밀번호 암호화 |
 
- ## 🖼️ 스크린샷
+## 🖼️ API 문서 및 테스트
 
- ## 🤝 개발협업
+### 📚 Swagger UI
+- **URL**: `http://localhost:8080/api/swagger-ui.html`
+- **기능**: 
+  - 모든 API 엔드포인트 문서화
+  - 실시간 API 테스트 가능
+  - 요청/응답 예시 제공
+  - JWT 인증 테스트 지원
+
+### 🔗 주요 엔드포인트
+
+| Method | Endpoint | 설명 | 인증 필요 |
+|--------|----------|------|----------|
+| POST | `/api/auth/register` | 회원가입 | ❌ |
+| POST | `/api/auth/login` | 로그인 | ❌ |
+| POST | `/api/auth/refresh` | 토큰 갱신 | ❌ |
+| GET | `/api/auth/google` | Google OAuth2 로그인 | ❌ |
+| GET | `/api/auth/oauth2/success` | OAuth2 성공 후 리다이렉트 | ❌ |
+| GET | `/api/auth/me` | 현재 사용자 정보 | ✅ |
+| POST | `/api/auth/logout` | 로그아웃 | ✅ |
+
+### 요청/응답 예시
+
+#### 회원가입
+```json
+POST /api/auth/register
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "name": "홍길동"
+}
+
+Response:
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tokenType": "Bearer",
+  "expiresIn": 900000,
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "name": "홍길동",
+    "role": "USER"
+  }
+}
+```
+
+#### 로그인
+```json
+POST /api/auth/login
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+
+Response: (회원가입과 동일한 형태)
+```
+
+#### 토큰 갱신
+```json
+POST /api/auth/refresh
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+
+Response: (새로운 accessToken과 refreshToken)
+```
+
+## 🛠 설치방법
+
+### 💻 Backend
+
+1. **프로젝트 클론**
+```bash
+git clone <repository-url>
+cd Project-BE
+```
+
+2. **환경 변수 설정**
+```bash
+# env.example 파일을 참고하여 환경 변수 설정
+cp env.example .env
+```
+
+3. **Google OAuth2 설정**
+- [Google Cloud Console](https://console.cloud.google.com/)에서 OAuth2 클라이언트 생성
+- `env.example`의 `GOOGLE_CLIENT_ID`와 `GOOGLE_CLIENT_SECRET` 설정
+
+4. **애플리케이션 실행**
+```bash
+# Maven으로 빌드
+mvn clean package
+
+# 애플리케이션 실행
+java -jar target/backend-0.0.1-SNAPSHOT.jar
+
+# 또는 Maven으로 직접 실행
+mvn spring-boot:run
+```
+
+5. **API 문서 확인 (Swagger UI)**
+- 브라우저에서 `http://localhost:8080/api/swagger-ui.html` 접속
+- 모든 API 엔드포인트를 확인하고 테스트할 수 있습니다
+- "Try it out" 버튼을 클릭하여 실제 API 호출 테스트 가능
+
+6. **H2 콘솔 접속**
+- 브라우저에서 `http://localhost:8080/api/h2-console` 접속
+- JDBC URL: `jdbc:h2:mem:testdb`
+- Username: `sa`
+- Password: `password`
+
+### AWS 배포
+
+1. **AWS Parameter Store 설정**
+```bash
+# aws-parameter-store-setup.md 파일 참고
+aws ssm put-parameter --name "/myapp/config/jwt-secret" --value "your-secret" --type "SecureString"
+```
+
+2. **AWS 프로파일로 실행**
+```bash
+java -jar -Dspring.profiles.active=aws your-app.jar
+```
+
+## 🔐 보안 고려사항
+
+- JWT Secret은 최소 256비트 이상의 랜덤 문자열 사용
+- AWS Parameter Store의 SecureString 타입으로 시크릿 저장
+- HTTPS 사용 (프로덕션 환경)
+- 정기적인 시크릿 로테이션
+- CORS 설정으로 허용된 도메인만 접근 가능
+
+## 🤝 개발협업
  ### 🌲 Branch 
 ```
 main ------- backend/<이름>/(<이슈번호>-)<작업명>    (백엔드 작업)
