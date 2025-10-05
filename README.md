@@ -1,14 +1,6 @@
-# Spring Boot 인증 시스템
-
-Spring Boot 3.2 + Java 17 기반의 보안 인증 시스템으로, 로컬 로그인과 Google OAuth2 로그인을 모두 지원합니다.
+# 한국 남자 일본 여자 만남 어플
 
 ## 📝 주요기능
-
-- **로컬 인증**: 이메일/비밀번호 회원가입 및 로그인
-- **Google OAuth2**: Google 계정으로 소셜 로그인
-- **JWT 토큰**: Access Token과 Refresh Token을 통한 보안 인증
-- **AWS 통합**: Parameter Store를 통한 시크릿 관리
-- **PKCE 지원**: OAuth2 보안 강화
 
 ## 🔨 기술스택
 <!-- 
