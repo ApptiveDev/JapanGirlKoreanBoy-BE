@@ -4,6 +4,10 @@ build/
 target/
 !**/src/main/**/target/
 !**/src/test/**/target/
+# 환경 변수 파일
+.env
+application-local.properties
+application-secret.properties
 
 ### STS ###
 .apt_generated
