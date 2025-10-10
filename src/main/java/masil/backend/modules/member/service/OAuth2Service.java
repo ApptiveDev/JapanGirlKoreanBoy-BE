@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import masil.backend.global.security.provider.JwtProvider;
 import masil.backend.modules.member.dto.response.OAuth2SignInResponse;
 import masil.backend.modules.member.dto.response.OAuth2UserInfo;
-import masil.backend.modules.member.entity.Member;
+import masil.backend.modules.member.entity.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,18 +32,18 @@ public class OAuth2Service {
     public OAuth2SignInResponse processOAuth2SignIn(OAuth2UserInfo userInfo) {
         // 기존 회원인지 확인 (이메일과 제공자로 조회)
         Member existingMember = memberLowService.findByEmailAndProvider(
-            userInfo.email(), 
-            Member.Provider.GOOGLE
+            userInfo.email(),
+                Provider.GOOGLE
         );
         
         if (existingMember != null) {
             // 기존 회원 로그인
             return createSignInResponse(existingMember, false);
-        } else {
-            // 신규 회원 가입
-            Member newMember = memberLowService.saveOAuth2Member(userInfo);
-            return createSignInResponse(newMember, true);
         }
+        // 신규 회원 가입
+        Member newMember = memberLowService.saveOAuth2Member(userInfo);
+        return createSignInResponse(newMember, true);
+
     }
 
     /**

@@ -69,10 +69,4 @@ public class Member extends BaseEntity {
         return this.password != null && this.password.equals(newPassword);
     }
 
-    public enum Provider {
-        /** 일반 회원가입 */
-        LOCAL, 
-        /** 구글 OAuth2 로그인 */
-        GOOGLE
-    }
 }

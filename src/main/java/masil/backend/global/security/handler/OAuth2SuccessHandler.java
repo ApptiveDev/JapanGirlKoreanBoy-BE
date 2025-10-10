@@ -65,8 +65,4 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         log.info("OAuth2 로그인 처리 완료: isNewMember={}", signInResponse.isNewMember());
     }
 
-    public record OAuth2ErrorResponse(
-        String message,
-        String details
-) {}
 }

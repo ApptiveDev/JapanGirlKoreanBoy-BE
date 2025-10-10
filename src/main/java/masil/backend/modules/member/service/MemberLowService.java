@@ -4,7 +4,7 @@ import static masil.backend.modules.member.exception.MemberExceptionType.ALREADY
 import static masil.backend.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
 
 import lombok.RequiredArgsConstructor;
-import masil.backend.modules.member.entity.Member;
+import masil.backend.modules.member.entity.*;
 import masil.backend.modules.member.dto.response.OAuth2UserInfo;
 import masil.backend.modules.member.exception.MemberException;
 import masil.backend.modules.member.repository.MemberRepository;
@@ -29,7 +29,7 @@ public class MemberLowService {
                 .name(name)
                 .email(email)
                 .password(password)
-                .provider(Member.Provider.LOCAL)
+                .provider(Provider.LOCAL)
                 .build();
 
         memberRepository.save(member);
@@ -41,7 +41,7 @@ public class MemberLowService {
         final Member member = Member.builder()
                 .name(userInfo.name())
                 .email(userInfo.email())
-                .provider(Member.Provider.GOOGLE)
+                .provider(Provider.GOOGLE)
                 .providerId(userInfo.providerId())
                 .build();
 
@@ -57,7 +57,7 @@ public class MemberLowService {
     }
 
     //이메일과 제공자로 회원 조회, 기존 회원 여부 판단
-    public Member findByEmailAndProvider(String email, Member.Provider provider) {
-        return memberRepository.findByEmailAndProvider(email, provider).orElse(null);
+    public Member findByEmailAndProvider(String email, Provider provider) {
+        return memberRepository.findByEmailAndProvider(email, provider).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
     }
 }

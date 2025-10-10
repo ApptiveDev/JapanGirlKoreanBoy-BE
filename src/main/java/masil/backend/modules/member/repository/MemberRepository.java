@@ -1,7 +1,7 @@
 package masil.backend.modules.member.repository;
 
 import java.util.Optional;
-import masil.backend.modules.member.entity.Member;
+import masil.backend.modules.member.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -9,5 +9,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Boolean existsByEmail(final String email);
 
-    Optional<Member> findByEmailAndProvider(String email, Member.Provider provider);
+    Optional<Member> findByEmailAndProvider(String email, Provider provider);
 }
