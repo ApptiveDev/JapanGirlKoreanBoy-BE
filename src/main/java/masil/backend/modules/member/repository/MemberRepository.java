@@ -2,6 +2,8 @@ package masil.backend.modules.member.repository;
 
 import java.util.Optional;
 import masil.backend.modules.member.entity.*;
+import masil.backend.modules.member.enums.Provider;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {

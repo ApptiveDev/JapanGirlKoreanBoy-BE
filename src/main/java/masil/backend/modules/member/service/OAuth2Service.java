@@ -5,6 +5,8 @@ import masil.backend.global.security.provider.JwtProvider;
 import masil.backend.modules.member.dto.response.OAuth2SignInResponse;
 import masil.backend.modules.member.dto.response.OAuth2UserInfo;
 import masil.backend.modules.member.entity.*;
+import masil.backend.modules.member.enums.Provider;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

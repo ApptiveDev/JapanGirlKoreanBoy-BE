@@ -1,4 +1,4 @@
-package masil.backend.modules.member.entity;
+package masil.backend.modules.member.enums;
 
 import lombok.Getter;
 
