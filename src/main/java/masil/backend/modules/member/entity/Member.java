@@ -15,6 +15,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import masil.backend.global.base.BaseEntity;
+import masil.backend.modules.member.enums.*;
+
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -50,16 +52,87 @@ public class Member extends BaseEntity {
     @Column
     private String providerId;
 
+// ===== 회원가입 시 필요한 필수 정보 =====
+    
+    /** 성별 (한국인 남성, 일본인 여성) */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Gender gender;
+
+    /** 키 (cm) */
+    @Column(nullable = false)
+    private Integer height;
+
+    /** 몸무게 (kg) */
+    @Column(nullable = false)
+    private Integer weight;
+
+    /** 거주 지역 */
+    @Column(nullable = false)
+    private String residenceArea;
+
+    /** 흡연 유무 */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SmokingStatus smokingStatus;
+
+    /** 음주 빈도 */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DrinkingFrequency drinkingFrequency;
+
+    /** 종교 */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Religion religion;
+
+    // ===== 선택 정보 =====
+
+    /** 학력 (인증) */
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Education education;
+
+    /** 재산 (인증) */
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Asset asset;
+
+    /** 기타 정보 */
+    @Column(columnDefinition = "TEXT")
+    private String otherInfo;
+
+    /** 프로필 사진 URL */
+    @Column
+    private String profileImageUrl;
+
     @Builder
     private Member(final String name, final String email, final String password, 
-                    final Provider provider, final String providerId) {
+                   final Provider provider, final String providerId,
+                   final Gender gender, final Integer height, final Integer weight,
+                   final String residenceArea, final SmokingStatus smokingStatus,
+                   final DrinkingFrequency drinkingFrequency, final Religion religion,
+                   final Education education, final Asset asset, final String otherInfo,
+                   final String profileImageUrl) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.provider = provider;
         this.providerId = providerId;
+        this.gender = gender;
+        this.height = height;
+        this.weight = weight;
+        this.residenceArea = residenceArea;
+        this.smokingStatus = smokingStatus;
+        this.drinkingFrequency = drinkingFrequency;
+        this.religion = religion;
+        this.education = education;
+        this.asset = asset;
+        this.otherInfo = otherInfo;
+        this.profileImageUrl = profileImageUrl;
         this.isDeleted = false;
     }
+
         
     public void updatePassword(final String newPassword) {
         this.password = newPassword;
