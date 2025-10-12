@@ -5,8 +5,14 @@ import static masil.backend.modules.member.exception.MemberExceptionType.NOT_FOU
 
 import lombok.RequiredArgsConstructor;
 import masil.backend.modules.member.entity.*;
+import masil.backend.modules.member.enums.Asset;
+import masil.backend.modules.member.enums.DrinkingFrequency;
+import masil.backend.modules.member.enums.Education;
+import masil.backend.modules.member.enums.Gender;
 import masil.backend.modules.member.enums.Provider;
 import masil.backend.modules.member.dto.response.OAuth2UserInfo;
+import masil.backend.modules.member.enums.Religion;
+import masil.backend.modules.member.enums.SmokingStatus;
 import masil.backend.modules.member.exception.MemberException;
 import masil.backend.modules.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
@@ -25,12 +31,39 @@ public class MemberLowService {
     }
 
     @Transactional
-    public void saveMember(final String name, final String email, final String password) {
+    public void saveLocalMember(
+            final String name,
+            final String email,
+            final String password,
+            final Gender gender,
+            final Integer height,
+            final Integer weight,
+            final String residenceArea,
+            final SmokingStatus smokingStatus,
+            final DrinkingFrequency drinkingFrequency,
+            final Religion religion,
+            final Education education,
+            final Asset asset,
+            final String otherInfo,
+            final String profileImageUrl
+    ) {
         final Member member = Member.builder()
                 .name(name)
                 .email(email)
                 .password(password)
                 .provider(Provider.LOCAL)
+                .gender(gender)
+                .height(height)
+                .weight(weight)
+                .residenceArea(residenceArea)
+                .smokingStatus(smokingStatus)
+                .drinkingFrequency(drinkingFrequency)
+                .religion(religion)
+
+                .education(education)
+                .asset(asset)
+                .otherInfo(otherInfo)
+                .profileImageUrl(profileImageUrl)
                 .build();
 
         memberRepository.save(member);

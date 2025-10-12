@@ -30,10 +30,21 @@ public class MemberHighService {
 
         memberLowService.checkIsDuplicateEmail(signUpRequest.email());
 
-        memberLowService.saveMember(
+        memberLowService.saveLocalMember(
                 signUpRequest.name(),
                 signUpRequest.email(),
-                encodedPassword
+                encodedPassword,
+                signUpRequest.gender(),
+                signUpRequest.height(),
+                signUpRequest.weight(),
+                signUpRequest.residenceArea(),
+                signUpRequest.smokingStatus(),
+                signUpRequest.drinkingFrequency(),
+                signUpRequest.religion(),
+                signUpRequest.education(),
+                signUpRequest.asset(),
+                signUpRequest.otherInfo(),
+                signUpRequest.profileImageUrl()
         );
     }
 
