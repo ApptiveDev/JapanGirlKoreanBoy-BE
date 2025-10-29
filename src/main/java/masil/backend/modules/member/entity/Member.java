@@ -60,30 +60,30 @@ public class Member extends BaseEntity {
     private Gender gender;
 
     /** 키 (cm) */
-    @Column(nullable = false)
+    @Column
     private Integer height;
 
     /** 몸무게 (kg) */
-    @Column(nullable = false)
+    @Column
     private Integer weight;
 
     /** 거주 지역 */
-    @Column(nullable = false)
+    @Column
     private String residenceArea;
 
     /** 흡연 유무 */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private SmokingStatus smokingStatus;
 
     /** 음주 빈도 */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private DrinkingFrequency drinkingFrequency;
 
     /** 종교 */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private Religion religion;
 
     // ===== 선택 정보 =====
