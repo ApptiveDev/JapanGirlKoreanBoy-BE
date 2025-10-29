@@ -89,9 +89,9 @@ public class MemberLowService {
     public Member getValidateExistMemberById(final Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
     }
-
     //이메일과 제공자로 회원 조회, 기존 회원 여부 판단
+
     public Member findByEmailAndProvider(String email, Provider provider) {
-        return memberRepository.findByEmailAndProvider(email, provider).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
+        return memberRepository.findByEmailAndProvider(email, provider).orElse(null); // 신규회원인 경우 null 반환
     }
 }
