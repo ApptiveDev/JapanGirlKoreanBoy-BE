@@ -30,10 +30,15 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final OAuth2Service oAuth2Service;
     private final ObjectMapper objectMapper;
+    private static final String OAUTH2_TEMP_USER_INFO = "OAUTH2_TEMP_USER_INFO";
+
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                      Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Authentication authentication
+        ) throws IOException, ServletException {
         
         log.info("OAuth2 로그인 성공: {}", authentication.getName());
         
@@ -54,15 +59,22 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         // OAuth2 로그인 처리 (기존 회원 확인, 신규 가입 등)
         OAuth2SignInResponse signInResponse = oAuth2Service.processOAuth2SignIn(userInfo);
 
+        // 신규 회원이고 프로필 완성이 필요한 경우 세션에 임시 저장
+        if (signInResponse.needsProfileCompletion()) {
+            HttpSession session = request.getSession();
+            session.setAttribute(OAUTH2_TEMP_USER_INFO, OAuth2TempUserInfo.from(userInfo));
+            log.info("OAuth2 신규 회원 - 프로필 완성 필요. 임시 정보 세션 저장 완료.");
+        }
+        
         // 응답 설정
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.setStatus(HttpServletResponse.SC_OK);
-        
         // JSON 응답 반환
         response.getWriter().write(objectMapper.writeValueAsString(signInResponse));
         
-        log.info("OAuth2 로그인 처리 완료: isNewMember={}", signInResponse.isNewMember());
+        log.info("OAuth2 로그인 처리 완료: isNewMember={}, needsProfileCompletion={}", 
+                signInResponse.isNewMember(), signInResponse.needsProfileCompletion());
     }
 
 }
