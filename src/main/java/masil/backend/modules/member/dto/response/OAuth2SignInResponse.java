@@ -33,7 +33,7 @@ public record OAuth2SignInResponse(
     }
     
     // 신규 회원이고 프로필 완성이 필요한 경우
-    public static OAuth2SignInResponse needsProfileCompletion() {
+    public static OAuth2SignInResponse needsProfile() {
         return new OAuth2SignInResponse(
                 null,
                 null,
