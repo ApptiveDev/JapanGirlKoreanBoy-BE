@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import masil.backend.modules.member.dto.response.OAuth2SignInResponse;
@@ -13,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import masil.backend.modules.member.dto.OAuth2TempUserInfo;
 
 import lombok.Builder;
 import java.io.IOException;
@@ -72,9 +74,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         response.setStatus(HttpServletResponse.SC_OK);
         // JSON 응답 반환
         response.getWriter().write(objectMapper.writeValueAsString(signInResponse));
-        
-        log.info("OAuth2 로그인 처리 완료: isNewMember={}, needsProfileCompletion={}", 
-                signInResponse.isNewMember(), signInResponse.needsProfileCompletion());
+        log.info("OAuth2 로그인 응답 needsProfileCompletion={}", signInResponse.needsProfileCompletion());
     }
 
 }

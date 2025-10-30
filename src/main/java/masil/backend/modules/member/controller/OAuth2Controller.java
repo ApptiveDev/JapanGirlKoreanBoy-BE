@@ -52,7 +52,7 @@ public class OAuth2Controller {
         // 세션에서 임시 정보 제거
         session.removeAttribute(OAUTH2_TEMP_USER_INFO);
         
-        log.info("OAuth2 프로필 완성 및 회원 생성 완료: memberId={}", response.memberId准备工作());
+        log.info("OAuth2 프로필 완성 및 회원 생성 완료: memberId={}", response.memberId());
         return ResponseEntity.ok(response);
     }
 }

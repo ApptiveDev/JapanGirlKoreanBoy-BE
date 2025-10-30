@@ -7,7 +7,7 @@ import masil.backend.modules.member.dto.request.CompleteOAuth2ProfileRequest;
 import masil.backend.modules.member.dto.response.OAuth2SignInResponse;
 import masil.backend.modules.member.dto.response.OAuth2UserInfo;
 import masil.backend.modules.member.entity.Member;
-import masil.backend.modules.member.enums.密室Provider;
+import masil.backend.modules.member.enums.Provider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,49 +24,31 @@ public class OAuth2Service {
      * 기존 회원이면 로그인, 신규 회원이면 프로필 정보 입력 필요 플래그 반환
      */
     public OAuth2SignInResponse processOAuth2SignIn(OAuth2UserInfo userInfo) {
-        // 기존 회원인지 확인
         Member existingMember = memberLowService.findByEmailAndProvider(
-            userInfo.email(),
-            Provider.GOOGLE
+                userInfo.email(),
+                Provider.GOOGLE
         );
-        
+    
         if (existingMember != null) {
-            // 기존 회원 로그인 - 즉시 토큰 발급
-            return createSignInResponse(existingMember, false);
+            String accessToken = jwtProvider.createToken(existingMember.getId().toString(), existingMember.getName());
+            return OAuth2SignInResponse.signedIn(existingMember, accessToken);
         }
-        
-        // 신규 회원인 경우 - 프로필 정보 입력 필요
-        // 회원은 아직 생성하지 않음
-        return OAuth2SignInResponse.needsProfileCompletion();
+    
+        // 신규 + 필수정보 미입력: 회원 미생성, 프로필 입력 필요 플래그만 반환
+        return OAuth2SignInResponse.needsProfile();
     }
 
-    /**
-     * OAuth2 프로필 완성 처리
-     * 임시 저장된 OAuth2 정보와 입력받은 프로필 정보로 회원 생성
-     */
+    @Transactional
     public OAuth2SignInResponse completeOAuth2Profile(
-            OAuth2TempUserInfo tempUserInfo,
-            CompleteOAuth2ProfileRequest profileRequest
+            final OAuth2TempUserInfo tempUserInfo,
+            final CompleteOAuth2ProfileRequest request
     ) {
-        // OAuth2 정보 + 프로필 정보로 회원 생성
-        Member newMember = memberLowService.saveOAuth2MemberWithProfile(
-                tempUserInfo,
-                profileRequest
-        );
-        
-        // 회원 생성 후 JWT 토큰 발급 및 로그인 처리
-        return createSignInResponse(newMember, true);
+        // 프로필 포함 신규 회원 생성
+        Member newMember = memberLowService.saveOAuth2MemberWithProfile(tempUserInfo, request);
+    
+        // 토큰 발급 후 로그인 완료 응답(needsProfileCompletion=false)
+        String accessToken = jwtProvider.createToken(newMember.getId().toString(), newMember.getName());
+        return OAuth2SignInResponse.signedIn(newMember, accessToken);
     }
 
-    private OAuth2SignInResponse createSignInResponse(Member member, boolean isNewMember) {
-        String accessToken = jwtProvider.createToken(member.getId().toString(), member.getName());
-        String refreshToken = "";
-
-        return new OAuth2SignInResponse(
-                member,
-                accessToken,
-                refreshToken,
-                isNewMember
-        );
-    }
 }

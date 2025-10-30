@@ -11,37 +11,26 @@ public record OAuth2SignInResponse(
         String email,
         String accessToken,
         String refreshToken,
-        boolean isNewMember,
         boolean needsProfileCompletion  // 프로필 완성 필요 여부
 ) {
-    // 기존 회원인 경우
-    public OAuth2SignInResponse(
-            final Member member,
-            final String accessToken,
-            final String refreshToken,
-            final boolean isNewMember
-    ) {
-        this(
+    // 로그인 완료(기존 회원 등): 토큰 포함, 프로필 입력 불필요
+    public static OAuth2SignInResponse signedIn(final Member member, final String accessToken) {
+        return new OAuth2SignInResponse(
                 member.getId(),
                 member.getName(),
                 member.getEmail(),
                 accessToken,
-                refreshToken,
-                isNewMember,
-                false  // 기존 회원은 프로필 완성 불필요
+                "",                 // refreshToken 미사용
+                false               // 프로필 입력 불필요
         );
     }
-    
-    // 신규 회원이고 프로필 완성이 필요한 경우
+
+    // 신규 + 프로필 미완성: 회원 미생성, 토큰 없음
     public static OAuth2SignInResponse needsProfile() {
         return new OAuth2SignInResponse(
-                null,
-                null,
-                null,
-                null,  // 토큰 없음
-                "",
-                true,  // 신규 회원
-                true   // 프로필 완성 필요
+                null, null, null,
+                null, "",
+                true                // 프로필 입력 필요
         );
     }
 }
