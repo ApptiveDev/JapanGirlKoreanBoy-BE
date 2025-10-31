@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 페이지 - 회원 관리</title>
+    <link rel="stylesheet" href="/admin/css/admin-main.css">
+</head>
+<body>
+<div class="admin-container">
+    <!-- 왼쪽 사이드바 -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>관리자 페이지</h2>
+        </div>
+        <nav class="nav-menu">
+            <button class="nav-tab active" data-gender="FEMALE">
+                <span class="tab-icon">🇯🇵</span>
+                <span class="tab-text">일본 여자</span>
+            </button>
+            <button class="nav-tab" data-gender="MALE">
+                <span class="tab-icon">🇰🇷</span>
+                <span class="tab-text">한국 남자</span>
+            </button>
+        </nav>
+    </aside>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <main class="main-content">
+        <!-- 헤더 -->
+        <header class="content-header">
+            <h1 id="current-tab-title">일본 여자 회원 관리</h1>
+            <div class="header-info">
+                <span class="total-count">전체: <strong id="total-count">0</strong>명</span>
+            </div>
+        </header>
+
+        <!-- 필터 및 검색 영역 -->
+        <section class="filter-section">
+            <div class="filter-group">
+                <!-- 상태 필터 -->
+                <div class="filter-item">
+                    <label for="status-filter">상태</label>
+                    <select id="status-filter" class="filter-select">
+                        <option value="">전체</option>
+                        <option value="PENDING_APPROVAL">승인대기</option>
+                        <option value="APPROVED">승인완료</option>
+                        <option value="CONNECTING">연결중</option>
+                        <option value="CONNECTED">연결됨</option>
+                        <option value="BLACKLISTED">블랙 유저</option>
+                    </select>
+                </div>
+
+                <!-- 날짜 정렬 -->
+                <div class="filter-item">
+                    <label for="date-sort">등록일</label>
+                    <select id="date-sort" class="filter-select">
+                        <option value="desc">최신순</option>
+                        <option value="asc">오래된순</option>
+                    </select>
+                </div>
+
+                <!-- 검색 -->
+                <div class="filter-item search-box">
+                    <label for="search-input">검색</label>
+                    <div class="search-wrapper">
+                        <input type="text" id="search-input" placeholder="이름, 이메일 검색" class="search-input">
+                        <button type="button" id="search-btn" class="search-btn">
+                            <span>🔍</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 필터 초기화 버튼 -->
+                <button type="button" id="reset-filter" class="reset-btn">
+                    초기화
+                </button>
+            </div>
+        </section>
+
+        <!-- 회원 목록 테이블 -->
+        <section class="table-section">
+            <div class="table-wrapper">
+                <table class="member-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>이름</th>
+                        <th>이메일</th>
+                        <th>상태</th>
+                        <th>등록일</th>
+                        <th>거주지역</th>
+                        <th>관리</th>
+                    </tr>
+                    </thead>
+                    <tbody id="member-table-body">
+                    <!-- 데이터가 여기에 동적으로 추가됩니다 -->
+                    <tr class="empty-row">
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <p>조회된 회원이 없습니다.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div class="pagination">
+                <button class="page-btn" id="prev-page" disabled>이전</button>
+                <div class="page-numbers" id="page-numbers">
+                    <button class="page-number active">1</button>
+                </div>
+                <button class="page-btn" id="next-page">다음</button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- 상태 변경 모달 -->
+<div id="status-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>회원 상태 변경</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-member-info">
+                <strong id="modal-member-name"></strong> 님의 상태를 변경합니다.
+            </p>
+            <div class="modal-form">
+                <label for="new-status">새로운 상태</label>
+                <select id="new-status" class="modal-select">
+                    <option value="PENDING_APPROVAL">승인대기</option>
+                    <option value="APPROVED">승인완료</option>
+                    <option value="CONNECTING">연결중</option>
+                    <option value="CONNECTED">연결됨</option>
+                    <option value="BLACKLISTED">블랙 유저</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-cancel" id="modal-cancel">취소</button>
+            <button class="btn btn-primary" id="modal-confirm">변경</button>
+        </div>
+    </div>
+</div>
+
+<script src="/admin/js/admin-main.js"></script>
+</body>
+</html>

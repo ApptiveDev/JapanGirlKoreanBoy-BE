@@ -22,11 +22,6 @@ import org.springframework.security.oauth2.client.web.AuthorizationRequestReposi
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
-/**
- * Spring Security 설정 클래스
- * 
- * OAuth2는 세션 기반으로 작동하고, 일반 API는 JWT 기반으로 작동하는 하이브리드 구조
- */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true)
@@ -44,9 +39,6 @@ public class SecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    /**
-     * OAuth2 인증 요청 저장소 (세션 기반)
-     */
     @Bean
     public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
         return new HttpSessionOAuth2AuthorizationRequestRepository();
@@ -81,7 +73,8 @@ public class SecurityConfig {
                                 "/sign-up/**",
                                 "/sign-in/**",
                                 "/oauth2/**",
-                                "/oauth2/authorization/**"
+                                "/oauth2/authorization/**",
+                                "/admin/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
