@@ -14,6 +14,7 @@ public enum MemberExceptionType implements BaseExceptionType {
     
     OAUTH2_AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "OAuth2 인증에 실패했습니다."),
     OAUTH2_USER_INFO_LOAD_FAILED(HttpStatus.BAD_REQUEST, "OAuth2 사용자 정보를 불러오는데 실패했습니다."),
+    MEMBER_RELIGION_OTHER_FAILED(HttpStatus.BAD_REQUEST, "종교를 '기타'로 선택한 경우 상세 정보를 입력해주세요.")
     ;
 
     private final HttpStatus httpStatus;
