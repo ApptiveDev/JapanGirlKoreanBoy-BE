@@ -44,6 +44,8 @@ public record SignUpRequest(
     @NotNull(message = "종교를 선택해주세요.")
     Religion religion,
 
+    String religionOther,
+
     Education education,
 
     Asset asset,

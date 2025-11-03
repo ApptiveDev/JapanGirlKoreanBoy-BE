@@ -1,6 +1,7 @@
 package masil.backend.modules.member.service;
 
 import static masil.backend.modules.member.exception.MemberExceptionType.CANNOT_MATCH_PASSWORD;
+import static masil.backend.modules.member.exception.MemberExceptionType.MEMBER_RELIGION_OTHER_FAILED;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import masil.backend.modules.member.dto.request.SignUpRequest;
 import masil.backend.modules.member.dto.response.MyInfoResponse;
 import masil.backend.modules.member.dto.response.SignInResponse;
 import masil.backend.modules.member.entity.Member;
+import masil.backend.modules.member.enums.Religion;
 import masil.backend.modules.member.exception.MemberException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ public class MemberHighService {
     private final PasswordEncoder passwordEncoder;
 
     public void signUp(final SignUpRequest signUpRequest) {
+        validateReligionOther(signUpRequest.religion(), signUpRequest.religionOther());
+
         final String encodedPassword = passwordEncoder.encode(signUpRequest.password());
 
         memberLowService.checkIsDuplicateEmail(signUpRequest.email());
@@ -41,6 +45,7 @@ public class MemberHighService {
                 signUpRequest.smokingStatus(),
                 signUpRequest.drinkingFrequency(),
                 signUpRequest.religion(),
+                signUpRequest.religionOther(),
                 signUpRequest.education(),
                 signUpRequest.asset(),
                 signUpRequest.otherInfo(),
@@ -69,5 +74,11 @@ public class MemberHighService {
 
     private String getToken(final Long memberId, final String name) {
         return jwtProvider.createToken(String.valueOf(memberId), name);
+    }
+
+    private void validateReligionOther(final Religion religion, final String religionOther) {
+        if (religion == Religion.OTHER && (religionOther == null || religionOther.isBlank())) {
+            throw new MemberException(MEMBER_RELIGION_OTHER_FAILED);
+        }
     }
 }
