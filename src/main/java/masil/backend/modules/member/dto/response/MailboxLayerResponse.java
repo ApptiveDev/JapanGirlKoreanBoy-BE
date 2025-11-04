@@ -10,6 +10,8 @@ import lombok.ToString;
 @NoArgsConstructor
 public class MailboxLayerResponse {
 
+    private String email;
+
     @JsonProperty("did_you_mean")
     private String didYouMean;
 
@@ -45,8 +47,6 @@ public class MailboxLayerResponse {
 
     public boolean isValid() {
         return Boolean.TRUE.equals(formatValid)
-                && Boolean.TRUE.equals(mxFound)
-                && Boolean.TRUE.equals(smtpCheck)
                 && Boolean.FALSE.equals(disposable);
     }
 }

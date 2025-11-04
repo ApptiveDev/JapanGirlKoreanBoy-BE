@@ -26,7 +26,7 @@ public class EmailValidationService {
                             .path("/api/check")
                             .queryParam("access_key", apiKey)
                             .queryParam("email", email)
-                            .queryParam("smtp", 1)
+                            .queryParam("smtp", 0)
                             .queryParam("format", 1)
                             .build())
                     .retrieve()
@@ -37,18 +37,19 @@ public class EmailValidationService {
                 return true;
             }
 
+            log.debug("Mailboxlayer API 응답: {}", response);
+
             boolean isValid = response.isValid();
 
             if (!isValid) {
-                log.info("이메일 검증 실패: {} - 형식: {}, MX레코드: {}, SMTP: {}, 일회용: {}",
+                log.info("이메일 검증 실패: {} - 형식: {}, 일회용: {}, 점수: {}",
                         email,
                         response.getFormatValid(),
-                        response.getMxFound(),
-                        response.getSmtpCheck(),
-                        response.getDisposable()
+                        response.getDisposable(),
+                        response.getScore()
                 );
             } else {
-                log.info("이메일 검증 성공: {}", email);
+                log.info("이메일 검증 성공: {} - 점수: {}", email, response.getScore());
             }
 
             return isValid;

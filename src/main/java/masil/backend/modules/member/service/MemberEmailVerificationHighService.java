@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class MemberEmailVerificationHighService {
     private final MemberEmailVerificationLowService memberEmailVerificationLowService;
@@ -31,24 +30,31 @@ public class MemberEmailVerificationHighService {
             throw new MemberException(INVALID_EMAIL);
         }
 
-        // 3. 기존 인증 코드가 있으면 삭제
+        // 3. 기존 인증 코드가 있으면 삭제 (별도 트랜잭션으로 완전히 삭제)
         if (memberEmailVerificationLowService.existsEmailVerification(email)) {
             memberEmailVerificationLowService.deleteEmailVerification(email);
         }
 
-        // 4. 6자리 랜덤 코드 생성
+        // 4. 저장 및 발송
+        saveAndSendEmailVerification(email);
+    }
+
+    @Transactional
+    public void saveAndSendEmailVerification(final String email) {
+        // 6자리 랜덤 코드 생성
         final String code = generateCode();
 
-        // 5. 만료 시간 설정 (5분 후)
+        // 만료 시간 설정 (5분)
         final LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(5);
 
-        // 6. DB에 저장
+        // DB에 저장
         memberEmailVerificationLowService.saveEmailVerification(email, code, expiresAt);
 
-        // 7. 이메일 발송
+        // 이메일 발송
         memberEmailVerificationLowService.sendEmail(email, code);
     }
 
+    @Transactional
     public void verifyEmailCode(final String email, final String inputCode) {
         // 1. 인증 정보 조회
         final MemberEmailVerification verification = memberEmailVerificationLowService.findEmailVerificationByEmail(email);
