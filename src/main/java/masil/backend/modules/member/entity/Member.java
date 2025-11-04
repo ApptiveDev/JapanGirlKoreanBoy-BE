@@ -30,7 +30,7 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Local: 일반 회원가입, Google:구글 로그인
+    // Local : 일반 회원가입, Google : 구글 로그인
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Provider provider;
