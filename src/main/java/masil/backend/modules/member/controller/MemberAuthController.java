@@ -7,6 +7,7 @@ import masil.backend.modules.member.dto.request.SignInRequest;
 import masil.backend.modules.member.dto.request.SignUpRequest;
 import masil.backend.modules.member.dto.request.VerifyEmailCodeRequest;
 import masil.backend.modules.member.dto.response.SignInResponse;
+import masil.backend.modules.member.service.MemberEmailVerificationHighService;
 import masil.backend.modules.member.service.MemberHighService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class MemberAuthController {
-
     public final MemberHighService memberHighService;
+    public final MemberEmailVerificationHighService memberEmailVerificationHighService;
 
     @PostMapping("/sign-up")
     public ResponseEntity<Void> signUp(@Valid @RequestBody final SignUpRequest signUpRequest) {
@@ -36,7 +37,7 @@ public class MemberAuthController {
     public ResponseEntity<Void> sendVerificationCode(
             @Valid @RequestBody final EmailVerificationCodeRequest request
     ) {
-        memberHighService.sendVerificationCode(request.email());
+        memberEmailVerificationHighService.sendVerificationCode(request.email());
         return ResponseEntity.ok().build();
     }
 
@@ -44,7 +45,7 @@ public class MemberAuthController {
     public ResponseEntity<Void> verifyEmailCode(
             @Valid @RequestBody final VerifyEmailCodeRequest request
     ) {
-        memberHighService.verifyEmailCode(request.email(), request.code());
+        memberEmailVerificationHighService.verifyEmailCode(request.email(), request.code());
         return ResponseEntity.ok().build();
     }
 }
