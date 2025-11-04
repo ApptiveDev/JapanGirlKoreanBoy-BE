@@ -1,11 +1,8 @@
 package masil.backend.modules.member.service;
 
 import static masil.backend.modules.member.exception.MemberExceptionType.CANNOT_MATCH_PASSWORD;
-import static masil.backend.modules.member.exception.MemberExceptionType.EMAIL_CODE_EXPIRED;
-import static masil.backend.modules.member.exception.MemberExceptionType.EMAIL_CODE_NOT_MATCH;
 import static masil.backend.modules.member.exception.MemberExceptionType.MEMBER_RELIGION_OTHER_FAILED;
 
-import java.security.SecureRandom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import masil.backend.global.security.provider.JwtProvider;
@@ -14,14 +11,11 @@ import masil.backend.modules.member.dto.request.SignUpRequest;
 import masil.backend.modules.member.dto.response.MyInfoResponse;
 import masil.backend.modules.member.dto.response.SignInResponse;
 import masil.backend.modules.member.entity.Member;
-import masil.backend.modules.member.entity.MemberEmailVerification;
 import masil.backend.modules.member.enums.Religion;
 import masil.backend.modules.member.exception.MemberException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @Slf4j
 @Service

@@ -1,8 +1,6 @@
 package masil.backend.modules.member.service;
 
 import static masil.backend.modules.member.exception.MemberExceptionType.EMAIL_CODE_DOES_NOT_EXISTS;
-import static masil.backend.modules.member.exception.MemberExceptionType.EMAIL_CODE_EXPIRED;
-import static masil.backend.modules.member.exception.MemberExceptionType.EMAIL_CODE_NOT_MATCH;
 
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +60,4 @@ public class MemberEmailVerificationLowService {
 
         mailSender.send(message);
     }
-
-
 }
