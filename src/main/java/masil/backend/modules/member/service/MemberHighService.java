@@ -1,8 +1,11 @@
 package masil.backend.modules.member.service;
 
 import static masil.backend.modules.member.exception.MemberExceptionType.CANNOT_MATCH_PASSWORD;
+import static masil.backend.modules.member.exception.MemberExceptionType.EMAIL_CODE_EXPIRED;
+import static masil.backend.modules.member.exception.MemberExceptionType.EMAIL_CODE_NOT_MATCH;
 import static masil.backend.modules.member.exception.MemberExceptionType.MEMBER_RELIGION_OTHER_FAILED;
 
+import java.security.SecureRandom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import masil.backend.global.security.provider.JwtProvider;
@@ -11,11 +14,14 @@ import masil.backend.modules.member.dto.request.SignUpRequest;
 import masil.backend.modules.member.dto.response.MyInfoResponse;
 import masil.backend.modules.member.dto.response.SignInResponse;
 import masil.backend.modules.member.entity.Member;
+import masil.backend.modules.member.entity.MemberEmailVerification;
 import masil.backend.modules.member.enums.Religion;
 import masil.backend.modules.member.exception.MemberException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -23,9 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberHighService {
     private final MemberLowService memberLowService;
-
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
+
+    private static final SecureRandom random = new SecureRandom();
 
     public void signUp(final SignUpRequest signUpRequest) {
         validateReligionOther(signUpRequest.religion(), signUpRequest.religionOther());
@@ -64,6 +71,51 @@ public class MemberHighService {
     public MyInfoResponse getMyInfo(final Long memberId) {
         final Member member = memberLowService.getValidateExistMemberById(memberId);
         return new MyInfoResponse(member);
+    }
+
+    public void sendVerificationCode(final String email) {
+        // 1. 이미 가입된 이메일인지 확인
+        memberLowService.checkIsDuplicateEmail(email);
+
+        // 2. 기존 인증 코드가 있으면 삭제
+        if (memberLowService.existsEmailVerification(email)) {
+            memberLowService.deleteEmailVerification(email);
+        }
+
+        // 3. 6자리 랜덤 코드 생성
+        final String code = generateCode();
+
+        // 4. 만료 시간 설정 (5분 후)
+        final LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(5);
+
+        // 5. DB에 저장
+        memberLowService.saveEmailVerification(email, code, expiresAt);
+
+        // 6. 이메일 발송
+        memberLowService.sendEmail(email, code);
+    }
+
+    public void verifyEmailCode(final String email, final String inputCode) {
+        // 1. 인증 정보 조회
+        final MemberEmailVerification verification = memberLowService.findEmailVerificationByEmail(email);
+
+        // 2. 만료 시간 체크
+        if (verification.isExpired()) {
+            throw new MemberException(EMAIL_CODE_EXPIRED);
+        }
+
+        // 3. 코드 일치 여부 확인
+        if (!verification.isCodeMatch(inputCode)) {
+            throw new MemberException(EMAIL_CODE_NOT_MATCH);
+        }
+
+        // 4. 인증 완료 처리
+        verification.verify();
+    }
+
+    private String generateCode() {
+        final int code = 100000 + random.nextInt(900000);
+        return String.valueOf(code);
     }
 
     private void checkCorrectPassword(final String savePassword, final String inputPassword) {

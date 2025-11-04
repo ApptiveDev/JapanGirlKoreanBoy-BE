@@ -1,6 +1,7 @@
 package masil.backend.modules.member.service;
 
 import static masil.backend.modules.member.exception.MemberExceptionType.ALREADY_EXIST_EMAIL;
+import static masil.backend.modules.member.exception.MemberExceptionType.EMAIL_CODE_DOES_NOT_EXISTS;
 import static masil.backend.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
 
 import lombok.RequiredArgsConstructor;
@@ -15,10 +16,15 @@ import masil.backend.modules.member.enums.Religion;
 import masil.backend.modules.member.enums.SmokingStatus;
 import masil.backend.modules.member.exception.MemberException;
 import masil.backend.modules.member.repository.MemberRepository;
+import masil.backend.modules.member.repository.MemberEmailVerificationRepository;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import masil.backend.modules.member.dto.OAuth2TempUserInfo;
 import masil.backend.modules.member.dto.request.CompleteOAuth2ProfileRequest;
+
+import java.time.LocalDateTime;
 
 
 @Service
@@ -26,6 +32,8 @@ import masil.backend.modules.member.dto.request.CompleteOAuth2ProfileRequest;
 @Transactional(readOnly = true)
 public class MemberLowService {
     private final MemberRepository memberRepository;
+    private final MemberEmailVerificationRepository emailVerificationRepository;
+    private final JavaMailSender mailSender;
 
     public void checkIsDuplicateEmail(final String email) {
         if(memberRepository.existsByEmail(email)) {
@@ -73,7 +81,6 @@ public class MemberLowService {
         memberRepository.save(member);
     }
 
-    //OAuth2 신규 회원 저장
     @Transactional
     public Member saveOAuth2Member(OAuth2UserInfo userInfo) {
         final Member member = Member.builder()
@@ -85,7 +92,7 @@ public class MemberLowService {
 
         return memberRepository.save(member);
     }
-    //OAuth2 프로필 완성 API에서 사용
+
     @Transactional
     public Member saveOAuth2MemberWithProfile(
            OAuth2TempUserInfo tempUserInfo,
@@ -119,8 +126,48 @@ public class MemberLowService {
     public Member getValidateExistMemberById(final Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new MemberException(NOT_FOUND_MEMBER));
     }
-    //이메일과 제공자로 회원 조회, 기존 회원 여부 판단
+
     public Member findByEmailAndProvider(String email, Provider provider) {
-        return memberRepository.findByEmailAndProvider(email, provider).orElse(null); // 신규회원인 경우 null 반환
+        return memberRepository.findByEmailAndProvider(email, provider).orElse(null);
+    }
+
+    @Transactional
+    public void saveEmailVerification(final String email, final String code, final LocalDateTime expiresAt) {
+        final MemberEmailVerification verification = MemberEmailVerification.builder()
+                .email(email)
+                .code(code)
+                .expiresAt(expiresAt)
+                .build();
+
+        emailVerificationRepository.save(verification);
+    }
+
+    public MemberEmailVerification findEmailVerificationByEmail(final String email) {
+        return emailVerificationRepository.findByEmail(email)
+                .orElseThrow(() -> new MemberException(EMAIL_CODE_DOES_NOT_EXISTS));
+    }
+
+    public boolean existsEmailVerification(final String email) {
+        return emailVerificationRepository.existsByEmail(email);
+    }
+
+    @Transactional
+    public void deleteEmailVerification(final String email) {
+        emailVerificationRepository.deleteByEmail(email);
+    }
+
+    public void sendEmail(final String to, final String code) {
+        final SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("[이어드림] 회원가입 이메일 인증 코드");
+        message.setText(
+                "안녕하세요, 이어드림입니다.\n\n" +
+                        "회원가입을 위한 인증 코드는 다음과 같습니다:\n\n" +
+                        "[" + code + "]\n\n" +
+                        "인증 코드는 5분간 유효합니다.\n" +
+                        "본인이 요청하지 않았다면 이 메일을 무시해주세요."
+        );
+
+        mailSender.send(message);
     }
 }

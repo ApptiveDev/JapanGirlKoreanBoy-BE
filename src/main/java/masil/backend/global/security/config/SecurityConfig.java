@@ -81,7 +81,8 @@ public class SecurityConfig {
                                 "/sign-up/**",
                                 "/sign-in/**",
                                 "/oauth2/**",
-                                "/oauth2/authorization/**"
+                                "/oauth2/authorization/**",
+                                "/email-code/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
