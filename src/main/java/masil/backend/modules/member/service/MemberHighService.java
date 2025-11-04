@@ -111,6 +111,9 @@ public class MemberHighService {
 
         // 4. 인증 완료 처리
         verification.verify();
+
+        // 5. 인증 코드 삭제
+        memberLowService.deleteEmailVerification(email);
     }
 
     private String generateCode() {

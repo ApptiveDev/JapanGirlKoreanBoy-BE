@@ -43,39 +43,18 @@ public class MemberLowService {
 
     @Transactional
     public void saveLocalMember(
-            final String name,
-            final String email,
-            final String password,
-            final Gender gender,
-            final Integer height,
-            final Integer weight,
-            final String residenceArea,
-            final SmokingStatus smokingStatus,
-            final DrinkingFrequency drinkingFrequency,
-            final Religion religion,
-            final String religionOther,
-            final Education education,
-            final Asset asset,
-            final String otherInfo,
-            final String profileImageUrl
+            final String name, final String email, final String password,
+            final Gender gender, final Integer height, final Integer weight,
+            final String residenceArea, final SmokingStatus smokingStatus, final DrinkingFrequency drinkingFrequency,
+            final Religion religion, final String religionOther, final Education education,
+            final Asset asset, final String otherInfo, final String profileImageUrl
     ) {
         final Member member = Member.builder()
-                .name(name)
-                .email(email)
-                .password(password)
-                .provider(Provider.LOCAL)
-                .gender(gender)
-                .height(height)
-                .weight(weight)
-                .residenceArea(residenceArea)
-                .smokingStatus(smokingStatus)
-                .drinkingFrequency(drinkingFrequency)
-                .religion(religion)
-                .religionOther(religionOther)
-                .education(education)
-                .asset(asset)
-                .otherInfo(otherInfo)
-                .profileImageUrl(profileImageUrl)
+                .name(name).email(email).password(password)
+                .provider(Provider.LOCAL).gender(gender).height(height)
+                .weight(weight).residenceArea(residenceArea).smokingStatus(smokingStatus)
+                .drinkingFrequency(drinkingFrequency).religion(religion).religionOther(religionOther)
+                .education(education).asset(asset).otherInfo(otherInfo).profileImageUrl(profileImageUrl)
                 .build();
 
         memberRepository.save(member);
