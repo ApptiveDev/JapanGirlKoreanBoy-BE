@@ -101,11 +101,19 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             url.append("&memberId=").append(URLEncoder.encode(signInResponse.memberId().toString(), StandardCharsets.UTF_8));
         }
         
+        if (signInResponse.name() != null) {
+            url.append("&name=").append(URLEncoder.encode(signInResponse.name(), StandardCharsets.UTF_8));
+        }
+        
+        if (signInResponse.email() != null) {
+            url.append("&email=").append(URLEncoder.encode(signInResponse.email(), StandardCharsets.UTF_8));
+        }
+        
         if (signInResponse.accessToken() != null) {
             url.append("&accessToken=").append(URLEncoder.encode(signInResponse.accessToken(), StandardCharsets.UTF_8));
         }
         
-        if (signInResponse.refreshToken() != null) {
+        if (signInResponse.refreshToken() != null && !signInResponse.refreshToken().isEmpty()) {
             url.append("&refreshToken=").append(URLEncoder.encode(signInResponse.refreshToken(), StandardCharsets.UTF_8));
         }
         
