@@ -26,7 +26,7 @@ public record OAuth2SignInResponse(
     }
 
     // 신규 + 프로필 미완성: 회원 미생성, 토큰 없음
-    public static OAuth2SignInResponse needsProfile() {
+    public static OAuth2SignInResponse needsProfile(final OAuth2UserInfo userInfo) {
         return new OAuth2SignInResponse(
                 null, userInfo.name(), userInfo.email(),
                 null, "",
