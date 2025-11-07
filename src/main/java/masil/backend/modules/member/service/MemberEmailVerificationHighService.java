@@ -23,7 +23,7 @@ public class MemberEmailVerificationHighService {
         // 1. 이미 가입된 이메일인지 확인
         memberLowService.checkIsDuplicateEmail(email);
 
-        // 2. 기존 인증 코드가 있으면 삭제 (별도 트랜잭션으로 완전히 삭제)
+        // 2. 기존 인증 코드가 있으면 삭제
         if (memberEmailVerificationLowService.existsEmailVerification(email)) {
             memberEmailVerificationLowService.deleteEmailVerification(email);
         }
@@ -62,10 +62,7 @@ public class MemberEmailVerificationHighService {
             throw new MemberException(EMAIL_CODE_NOT_MATCH);
         }
 
-        // 4. 인증 완료 처리
-        verification.verify();
-
-        // 5. 인증 코드 삭제
+        // 4. 인증 코드 삭제
         memberEmailVerificationLowService.deleteEmailVerification(email);
     }
 

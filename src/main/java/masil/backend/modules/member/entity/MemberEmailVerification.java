@@ -34,21 +34,13 @@ public class MemberEmailVerification extends BaseEntity {
     private String code;
 
     @Column(nullable = false)
-    private Boolean verified = false;
-
-    @Column(nullable = false)
     private LocalDateTime expiresAt;
 
     @Builder
     private MemberEmailVerification(String email, String code, LocalDateTime expiresAt) {
         this.email = email;
         this.code = code;
-        this.verified = false;
         this.expiresAt = expiresAt;
-    }
-
-    public void verify() {
-        this.verified = true;
     }
 
     public boolean isExpired() {

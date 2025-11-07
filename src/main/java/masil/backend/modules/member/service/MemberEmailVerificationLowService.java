@@ -43,7 +43,7 @@ public class MemberEmailVerificationLowService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void deleteEmailVerification(final String email) {
         emailVerificationRepository.deleteByEmail(email);
-        emailVerificationRepository.flush();  // 즉시 DB 반영
+        emailVerificationRepository.flush();
     }
 
     public void sendEmail(final String to, final String code) {
