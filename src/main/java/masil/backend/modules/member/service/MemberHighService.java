@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberHighService {
     private final MemberLowService memberLowService;
-
     private final JwtProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
 

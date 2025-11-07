@@ -1,4 +1,4 @@
-package masil.backend.modules.member.service;
+package masil.backend.global.security.service;
 
 import static masil.backend.modules.member.exception.MemberExceptionType.NOT_FOUND_MEMBER;
 
