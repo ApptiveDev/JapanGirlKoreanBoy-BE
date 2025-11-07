@@ -3,8 +3,7 @@ package masil.backend.modules.member.dto.response;
 import masil.backend.modules.member.entity.Member;
 
 /**
- * OAuth2 로그인 성공 응답 (record 버전)
- * - JWT 토큰, 사용자 정보, 신규 회원 여부 포함
+ * OAuth2 로그인 성공 응답
  */
 public record OAuth2SignInResponse(
         Long memberId,
@@ -12,21 +11,26 @@ public record OAuth2SignInResponse(
         String email,
         String accessToken,
         String refreshToken,
-        boolean isNewMember
+        boolean needsProfileCompletion  // 프로필 완성 필요 여부
 ) {
-    public OAuth2SignInResponse(
-            final Member member,
-            final String accessToken,
-            final String refreshToken,
-            final boolean isNewMember
-    ) {
-        this(
+    // 로그인 완료(기존 회원 등): 토큰 포함, 프로필 입력 불필요
+    public static OAuth2SignInResponse signedIn(final Member member, final String accessToken) {
+        return new OAuth2SignInResponse(
                 member.getId(),
                 member.getName(),
                 member.getEmail(),
                 accessToken,
-                refreshToken,
-                isNewMember
+                "",                 // refreshToken 미사용
+                false               // 프로필 입력 불필요
+        );
+    }
+
+    // 신규 + 프로필 미완성: 회원 미생성, 토큰 없음
+    public static OAuth2SignInResponse needsProfile(final OAuth2UserInfo userInfo) {
+        return new OAuth2SignInResponse(
+                null, userInfo.name(), userInfo.email(),
+                null, "",
+                true                // 프로필 입력 필요
         );
     }
 }

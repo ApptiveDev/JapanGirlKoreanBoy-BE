@@ -30,22 +30,7 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false, unique = true)
-    private String email;
-    
-    @Column
-    private String password;
-
-    @Column(nullable = false)
-    private Boolean isDeleted;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private MemberStatus status;
-
+    // Local : 일반 회원가입, Google : 구글 로그인
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Provider provider;
@@ -54,6 +39,19 @@ public class Member extends BaseEntity {
     @Column
     private String providerId;
 
+    @Column(nullable = false)
+    private Boolean isDeleted;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column
+    private String password;
+
+    /** 필수 정보들 **/
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Gender gender;
@@ -79,6 +77,10 @@ public class Member extends BaseEntity {
     @Column
     private Religion religion;
 
+    @Column
+    private String religionOther; // 종교 - 기타 입력값
+
+    /** 선택 정보들**/
     @Enumerated(EnumType.STRING)
     @Column
     private Education education;
@@ -98,7 +100,7 @@ public class Member extends BaseEntity {
                    final Provider provider, final String providerId,
                    final Gender gender, final Integer height, final Integer weight,
                    final String residenceArea, final SmokingStatus smokingStatus,
-                   final DrinkingFrequency drinkingFrequency, final Religion religion,
+                   final DrinkingFrequency drinkingFrequency, final Religion religion, final String religionOther,
                    final Education education, final Asset asset, final String otherInfo,
                    final String profileImageUrl) {
         this.name = name;
@@ -113,6 +115,7 @@ public class Member extends BaseEntity {
         this.smokingStatus = smokingStatus;
         this.drinkingFrequency = drinkingFrequency;
         this.religion = religion;
+        this.religionOther = religionOther;
         this.education = education;
         this.asset = asset;
         this.otherInfo = otherInfo;

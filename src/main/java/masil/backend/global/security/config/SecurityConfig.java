@@ -74,7 +74,8 @@ public class SecurityConfig {
                                 "/sign-in/**",
                                 "/oauth2/**",
                                 "/oauth2/authorization/**",
-                                "/admin/**"
+                                "/admin/**",
+                                "/email-code/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

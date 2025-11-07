@@ -2,15 +2,12 @@ package masil.backend.modules.member.enums;
 
 import lombok.Getter;
 
-/**
- * 음주 빈도 Enum
- */
 @Getter
 public enum DrinkingFrequency {
-    NEVER("전혀 안함"),
-    OCCASIONALLY("가끔"),
-    FREQUENTLY("자주"),
-    DAILY("매일");
+    LESS_THAN_ONCE_A_WEEK("주 1회 미만"),
+    ONCE_A_WEEK("주 1회"),
+    TWICE_A_WEEK("주 2회"),
+    MORE_THAN_THREE_TIMES_A_WEEK("주 3회 이상");
 
     private final String displayName;
 
