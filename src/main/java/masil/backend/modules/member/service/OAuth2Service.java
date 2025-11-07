@@ -35,7 +35,7 @@ public class OAuth2Service {
         }
     
         // 신규 + 필수정보 미입력: 회원 미생성, 프로필 입력 필요 플래그만 반환
-        return OAuth2SignInResponse.needsProfile();
+        return OAuth2SignInResponse.needsProfile(userInfo);
     }
 
     @Transactional
