@@ -2,7 +2,6 @@ package masil.backend.modules.member.service;
 
 import static masil.backend.modules.member.exception.MemberExceptionType.EMAIL_CODE_EXPIRED;
 import static masil.backend.modules.member.exception.MemberExceptionType.EMAIL_CODE_NOT_MATCH;
-import static masil.backend.modules.member.exception.MemberExceptionType.INVALID_EMAIL;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberEmailVerificationHighService {
     private final MemberEmailVerificationLowService memberEmailVerificationLowService;
     private final MemberLowService memberLowService;
-    private final EmailValidationService emailValidationService;
 
     private static final SecureRandom random = new SecureRandom();
 
@@ -25,17 +23,12 @@ public class MemberEmailVerificationHighService {
         // 1. 이미 가입된 이메일인지 확인
         memberLowService.checkIsDuplicateEmail(email);
 
-        // 2. 실제 존재하는 이메일인지 확인
-        if (!emailValidationService.isEmailValid(email)) {
-            throw new MemberException(INVALID_EMAIL);
-        }
-
-        // 3. 기존 인증 코드가 있으면 삭제 (별도 트랜잭션으로 완전히 삭제)
+        // 2. 기존 인증 코드가 있으면 삭제 (별도 트랜잭션으로 완전히 삭제)
         if (memberEmailVerificationLowService.existsEmailVerification(email)) {
             memberEmailVerificationLowService.deleteEmailVerification(email);
         }
 
-        // 4. 저장 및 발송
+        // 3. 저장 및 발송
         saveAndSendEmailVerification(email);
     }
 
