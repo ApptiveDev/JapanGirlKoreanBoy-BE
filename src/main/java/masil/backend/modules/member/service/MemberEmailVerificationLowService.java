@@ -4,15 +4,18 @@ import static masil.backend.modules.member.exception.MemberExceptionType.EMAIL_C
 
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import masil.backend.modules.member.entity.MemberEmailVerification;
 import masil.backend.modules.member.exception.MemberException;
 import masil.backend.modules.member.repository.MemberEmailVerificationRepository;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -46,6 +49,7 @@ public class MemberEmailVerificationLowService {
         emailVerificationRepository.flush();
     }
 
+    @Async("emailTaskExecutor")
     public void sendEmail(final String to, final String code) {
         final SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);

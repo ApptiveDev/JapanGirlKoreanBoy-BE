@@ -43,7 +43,7 @@ public class MemberEmailVerificationHighService {
         // DB에 저장
         memberEmailVerificationLowService.saveEmailVerification(email, code, expiresAt);
 
-        // 이메일 발송
+        // 이메일 발송 (비동기)
         memberEmailVerificationLowService.sendEmail(email, code);
     }
 
