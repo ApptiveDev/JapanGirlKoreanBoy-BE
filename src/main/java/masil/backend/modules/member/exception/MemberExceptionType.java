@@ -18,6 +18,8 @@ public enum MemberExceptionType implements BaseExceptionType {
     EMAIL_CODE_EXPIRED(HttpStatus.BAD_REQUEST, "이메일 인증 코드가 만료되었습니다. 인증 코드를 재발송해주세요."),
     EMAIL_CODE_NOT_MATCH(HttpStatus.BAD_REQUEST, "이메일 인증 코드가 일치하지 않습니다."),
     EMAIL_CODE_DOES_NOT_EXISTS(HttpStatus.BAD_REQUEST, "이메일 인증 코드가 존재하지 않습니다. 인증 코드를 재발송해주세요."),
+
+    MEMBER_PREFERENCES_NOT_FOUND(HttpStatus.NOT_FOUND, "저장된 선호 정보가 없습니다.")
     ;
 
     private final HttpStatus httpStatus;

@@ -42,14 +42,14 @@ public record SaveMemberPreferenceRequest(
         List<JobType> avoidedJobs,
 
         @Pattern(regexp = "^[EIX]$", message = "MBTI E/I는 E, I, X 중 하나여야 합니다.")
-        String mbtiE,
+        String mbti1,
 
         @Pattern(regexp = "^[NSX]$", message = "MBTI N/S는 N, S, X 중 하나여야 합니다.")
-        String mbtiN,
+        String mbti2,
 
         @Pattern(regexp = "^[TFX]$", message = "MBTI T/F는 T, F, X 중 하나여야 합니다.")
-        String mbtiT,
+        String mbti3,
 
         @Pattern(regexp = "^[JPX]$", message = "MBTI J/P는 J, P, X 중 하나여야 합니다.")
-        String mbtiJ
+        String mbti4
 ) {}
