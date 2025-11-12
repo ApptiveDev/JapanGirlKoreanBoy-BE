@@ -8,6 +8,7 @@ import masil.backend.global.base.BaseEntity;
 import masil.backend.modules.member.enums.AppearanceStyle;
 import masil.backend.modules.member.enums.EducationLevel;
 import masil.backend.modules.member.enums.ParentAssetLevel;
+import masil.backend.modules.member.enums.PreferenceCategory;
 
 @Entity
 @Getter
@@ -76,6 +77,18 @@ public class MemberPreference extends BaseEntity {
     @Column(length = 1, nullable = false)
     private String mbtiJ; // "J" or "P" or "X"(상관없음)
 
+    @Enumerated(EnumType.STRING)
+    @Column
+    private PreferenceCategory priority1;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private PreferenceCategory priority2;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private PreferenceCategory priority3;
+
     public MemberPreference(
             Member member,
             Integer preferredHeightMin,
@@ -91,7 +104,10 @@ public class MemberPreference extends BaseEntity {
             String mbtiE,
             String mbtiN,
             String mbtiT,
-            String mbtiJ
+            String mbtiJ,
+            PreferenceCategory priority1,
+            PreferenceCategory priority2,
+            PreferenceCategory priority3
     ) {
         this.member = member;
         this.preferredHeightMin = preferredHeightMin;
@@ -108,6 +124,9 @@ public class MemberPreference extends BaseEntity {
         this.mbtiN = mbtiN;
         this.mbtiT = mbtiT;
         this.mbtiJ = mbtiJ;
+        this.priority1 = priority1;
+        this.priority2 = priority2;
+        this.priority3 = priority3;
     }
 
     public void updatePreference(

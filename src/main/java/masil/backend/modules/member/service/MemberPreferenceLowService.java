@@ -12,6 +12,7 @@ import masil.backend.modules.member.enums.AppearanceStyle;
 import masil.backend.modules.member.enums.EducationLevel;
 import masil.backend.modules.member.enums.JobType;
 import masil.backend.modules.member.enums.ParentAssetLevel;
+import masil.backend.modules.member.enums.PreferenceCategory;
 import masil.backend.modules.member.repository.MemberPreferenceRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,7 +48,10 @@ public class MemberPreferenceLowService {
             final String mbti1,
             final String mbti2,
             final String mbti3,
-            final String mbti4
+            final String mbti4,
+            final PreferenceCategory priority1,
+            final PreferenceCategory priority2,
+            final PreferenceCategory priority3
     ) {
         final MemberPreference preference = new MemberPreference(
                 member,
@@ -64,7 +68,10 @@ public class MemberPreferenceLowService {
                 mbti1,
                 mbti2,
                 mbti3,
-                mbti4
+                mbti4,
+                priority1,
+                priority2,
+                priority3
         );
 
         memberPreferenceRepository.save(preference);

@@ -2,12 +2,14 @@ package masil.backend.modules.member.dto.request;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import masil.backend.modules.member.enums.AppearanceStyle;
 import masil.backend.modules.member.enums.EducationLevel;
 import masil.backend.modules.member.enums.JobType;
 import masil.backend.modules.member.enums.ParentAssetLevel;
+import masil.backend.modules.member.enums.PreferenceCategory;
 import masil.backend.modules.member.enums.Religion;
 
 import java.util.List;
@@ -51,5 +53,14 @@ public record SaveMemberPreferenceRequest(
         String mbti3,
 
         @Pattern(regexp = "^[JPX]$", message = "MBTI J/P는 J, P, X 중 하나여야 합니다.")
-        String mbti4
+        String mbti4,
+
+        @NotNull(message = "1순위를 선택해주세요.")
+        PreferenceCategory priority1,
+
+        @NotNull(message = "2순위를 선택해주세요.")
+        PreferenceCategory priority2,
+
+        @NotNull(message = "3순위를 선택해주세요.")
+        PreferenceCategory priority3
 ) {}
