@@ -32,7 +32,7 @@ public class MemberPreferenceLowService {
 
 
     @Transactional
-    public MemberPreference saveMemberPreference(
+    public void saveMemberPreference(
             final Member member,
             final Integer preferredHeightMin,
             final Integer preferredHeightMax,
@@ -44,10 +44,10 @@ public class MemberPreferenceLowService {
             final Long preferredAssetMax,
             final String preferredJobsJson,
             final String avoidedJobsJson,
-            final String mbtiE,
-            final String mbtiN,
-            final String mbtiT,
-            final String mbtiJ
+            final String mbti1,
+            final String mbti2,
+            final String mbti3,
+            final String mbti4
     ) {
         final MemberPreference preference = new MemberPreference(
                 member,
@@ -61,13 +61,13 @@ public class MemberPreferenceLowService {
                 preferredAssetMax,
                 preferredJobsJson,
                 avoidedJobsJson,
-                mbtiE,
-                mbtiN,
-                mbtiT,
-                mbtiJ
+                mbti1,
+                mbti2,
+                mbti3,
+                mbti4
         );
 
-        return memberPreferenceRepository.save(preference);
+        memberPreferenceRepository.save(preference);
     }
 
     public String convertJobListToJson(final List<JobType> jobs) {
