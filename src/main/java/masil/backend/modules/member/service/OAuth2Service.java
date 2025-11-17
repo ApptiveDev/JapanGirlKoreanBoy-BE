@@ -1,5 +1,4 @@
 package masil.backend.modules.member.service;
-
 import lombok.RequiredArgsConstructor;
 import masil.backend.global.security.provider.JwtProvider;
 import masil.backend.modules.member.dto.OAuth2TempUserInfo;
@@ -8,8 +7,12 @@ import masil.backend.modules.member.dto.response.OAuth2SignInResponse;
 import masil.backend.modules.member.dto.response.OAuth2UserInfo;
 import masil.backend.modules.member.entity.Member;
 import masil.backend.modules.member.enums.Provider;
+import masil.backend.modules.member.enums.Religion;
+import masil.backend.modules.member.exception.MemberException;
+import masil.backend.modules.member.exception.MemberExceptionType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -19,10 +22,6 @@ public class OAuth2Service {
     private final MemberLowService memberLowService;
     private final JwtProvider jwtProvider;
 
-    /**
-     * OAuth2 로그인 처리
-     * 기존 회원이면 로그인, 신규 회원이면 프로필 정보 입력 필요 플래그 반환
-     */
     public OAuth2SignInResponse processOAuth2SignIn(OAuth2UserInfo userInfo) {
         Member existingMember = memberLowService.findByEmailAndProvider(
                 userInfo.email(),
@@ -43,12 +42,15 @@ public class OAuth2Service {
             final OAuth2TempUserInfo tempUserInfo,
             final CompleteOAuth2ProfileRequest request
     ) {
-        // 프로필 포함 신규 회원 생성
+        validateReligionOther(request.religion(), request.religionOther());
+        memberLowService.checkIsDuplicateEmail(tempUserInfo.email());
         Member newMember = memberLowService.saveOAuth2MemberWithProfile(tempUserInfo, request);
-    
-        // 토큰 발급 후 로그인 완료 응답(needsProfileCompletion=false)
         String accessToken = jwtProvider.createToken(newMember.getId().toString(), newMember.getName());
         return OAuth2SignInResponse.signedIn(newMember, accessToken);
     }
-
+    private void validateReligionOther(final Religion religion, final String religionOther) {
+        if (religion == Religion.OTHER && (religionOther == null || religionOther.isBlank())) {
+            throw new MemberException(MemberExceptionType.MEMBER_RELIGION_OTHER_FAILED);
+        }
+    }
 }

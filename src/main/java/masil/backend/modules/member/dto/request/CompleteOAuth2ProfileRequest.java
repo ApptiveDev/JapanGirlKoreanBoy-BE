@@ -4,9 +4,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import masil.backend.modules.member.enums.*;
 
-/**
- * OAuth2 로그인 후 프로필 완성을 위한 요청 DTO
- */
+
 public record CompleteOAuth2ProfileRequest(
         @NotNull(message = "성별을 입력해주세요.")
         Gender gender,
@@ -30,6 +28,8 @@ public record CompleteOAuth2ProfileRequest(
         
         @NotNull(message = "종교를 선택해주세요.")
         Religion religion,
+        
+        String religionOther,
         
         Education education,
         

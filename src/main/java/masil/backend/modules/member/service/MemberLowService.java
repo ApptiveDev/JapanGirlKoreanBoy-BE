@@ -103,6 +103,7 @@ public class MemberLowService {
                .smokingStatus(profileRequest.smokingStatus())
                .drinkingFrequency(profileRequest.drinkingFrequency())
                .religion(profileRequest.religion())
+               .religionOther(profileRequest.religionOther())
                .education(profileRequest.education())
                .asset(profileRequest.asset())
                .otherInfo(profileRequest.otherInfo())
