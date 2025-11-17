@@ -30,7 +30,7 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Local: 일반 회원가입, Google:구글 로그인
+    // Local : 일반 회원가입, Google : 구글 로그인
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Provider provider;
@@ -42,13 +42,16 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private Boolean isDeleted;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MemberStatus status;
+
     @Column(nullable = false)
     private String name;
 
     @Column(nullable = false, unique = true)
     private String email;
-    
-    //OAuth2의 경우 null 가능
+
     @Column
     private String password;
 
@@ -122,5 +125,22 @@ public class Member extends BaseEntity {
         this.otherInfo = otherInfo;
         this.profileImageUrl = profileImageUrl;
         this.isDeleted = false;
+        this.status = MemberStatus.PENDING_APPROVAL;
+    }
+
+    public void updatePassword(final String newPassword) {
+        this.password = newPassword;
+    }
+
+    public boolean isPasswordEqual(final String newPassword) {
+        return this.password != null && this.password.equals(newPassword);
+    }
+
+    public void approve() {
+        this.status = MemberStatus.APPROVED;
+    }
+
+    public void blacklist() {
+        this.status = MemberStatus.BLACKLISTED;
     }
 }
