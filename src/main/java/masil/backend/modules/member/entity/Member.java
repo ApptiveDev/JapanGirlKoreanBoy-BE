@@ -143,4 +143,16 @@ public class Member extends BaseEntity {
     public void blacklist() {
         this.status = MemberStatus.BLACKLISTED;
     }
+    
+    public void changeToConnecting() {
+        this.status = MemberStatus.CONNECTING;
+    }
+    
+    public void changeToConnected() {
+        this.status = MemberStatus.CONNECTED;
+    }
+    
+    public void changeStatus(MemberStatus newStatus) {
+        this.status = newStatus;
+    }
 }
