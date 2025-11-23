@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>관리자 페이지 - 회원 관리</title>
+    <title>관리자 페이지 - 매칭 관리</title>
     <link rel="stylesheet" href="/admin/css/admin-main.css">
 </head>
 <body>
@@ -14,13 +14,13 @@
             <h2>관리자 페이지</h2>
         </div>
         <nav class="nav-menu">
-            <button class="nav-tab active" data-gender="FEMALE">
-                <span class="tab-icon">🇯🇵</span>
-                <span class="tab-text">일본 여자</span>
+            <button class="nav-tab active" data-tab="approval">
+                <span class="tab-icon">✅</span>
+                <span class="tab-text">유저 승인</span>
             </button>
-            <button class="nav-tab" data-gender="MALE">
-                <span class="tab-icon">🇰🇷</span>
-                <span class="tab-text">한국 남자</span>
+            <button class="nav-tab" data-tab="matching">
+                <span class="tab-icon">💕</span>
+                <span class="tab-text">유저 매칭</span>
             </button>
         </nav>
     </aside>
@@ -29,93 +29,143 @@
     <main class="main-content">
         <!-- 헤더 -->
         <header class="content-header">
-            <h1 id="current-tab-title">일본 여자 회원 관리</h1>
+            <h1 id="current-tab-title">유저 승인</h1>
             <div class="header-info">
                 <span class="total-count">전체: <strong id="total-count">0</strong>명</span>
             </div>
         </header>
 
-        <!-- 필터 및 검색 영역 -->
-        <section class="filter-section">
-            <div class="filter-group">
-                <!-- 상태 필터 -->
-                <div class="filter-item">
-                    <label for="status-filter">상태</label>
-                    <select id="status-filter" class="filter-select">
-                        <option value="">전체</option>
-                        <option value="PENDING_APPROVAL">승인대기</option>
-                        <option value="APPROVED">승인완료</option>
-                        <option value="CONNECTING">연결중</option>
-                        <option value="CONNECTED">연결됨</option>
-                        <option value="BLACKLISTED">블랙 유저</option>
-                    </select>
-                </div>
-
-                <!-- 날짜 정렬 -->
-                <div class="filter-item">
-                    <label for="date-sort">등록일</label>
-                    <select id="date-sort" class="filter-select">
-                        <option value="desc">최신순</option>
-                        <option value="asc">오래된순</option>
-                    </select>
-                </div>
-
-                <!-- 검색 -->
-                <div class="filter-item search-box">
-                    <label for="search-input">검색</label>
-                    <div class="search-wrapper">
-                        <input type="text" id="search-input" placeholder="이름, 이메일 검색" class="search-input">
-                        <button type="button" id="search-btn" class="search-btn">
-                            <span>🔍</span>
-                        </button>
+        <!-- 유저 승인 탭 콘텐츠 -->
+        <div id="approval-tab-content" class="tab-content active">
+            <!-- 필터 및 검색 영역 -->
+            <section class="filter-section">
+                <div class="filter-group">
+                    <div class="filter-item search-box">
+                        <label for="search-input">검색</label>
+                        <div class="search-wrapper">
+                            <input type="text" id="search-input" placeholder="이름, 이메일 검색" class="search-input">
+                            <button type="button" id="search-btn" class="search-btn">
+                                <span>🔍</span>
+                            </button>
+                        </div>
                     </div>
+                    <button type="button" id="reset-filter" class="reset-btn">초기화</button>
                 </div>
+            </section>
 
-                <!-- 필터 초기화 버튼 -->
-                <button type="button" id="reset-filter" class="reset-btn">
-                    초기화
-                </button>
-            </div>
-        </section>
-
-        <!-- 회원 목록 테이블 -->
-        <section class="table-section">
-            <div class="table-wrapper">
-                <table class="member-table">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>이름</th>
-                        <th>이메일</th>
-                        <th>상태</th>
-                        <th>등록일</th>
-                        <th>거주지역</th>
-                        <th>관리</th>
-                    </tr>
-                    </thead>
-                    <tbody id="member-table-body">
-                    <!-- 데이터가 여기에 동적으로 추가됩니다 -->
-                    <tr class="empty-row">
-                        <td colspan="7">
-                            <div class="empty-state">
-                                <p>조회된 회원이 없습니다.</p>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- 페이지네이션 -->
-            <div class="pagination">
-                <button class="page-btn" id="prev-page" disabled>이전</button>
-                <div class="page-numbers" id="page-numbers">
-                    <button class="page-number active">1</button>
+            <!-- 승인 대기 회원 목록 테이블 -->
+            <section class="table-section">
+                <div class="table-wrapper">
+                    <table class="member-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>이름</th>
+                            <th>이메일</th>
+                            <th>상태</th>
+                            <th>등록일</th>
+                            <th>거주지역</th>
+                            <th>관리</th>
+                        </tr>
+                        </thead>
+                        <tbody id="approval-table-body">
+                        <tr class="empty-row">
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <p>조회된 회원이 없습니다.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <button class="page-btn" id="next-page">다음</button>
-            </div>
-        </section>
+            </section>
+        </div>
+
+        <!-- 유저 매칭 탭 콘텐츠 -->
+        <div id="matching-tab-content" class="tab-content">
+            <!-- 연결중 여성 유저 목록 -->
+            <section class="table-section" id="female-list-section">
+                <h2 style="margin-bottom: 20px; color: #2d3748;">연결중 상태 여성 유저</h2>
+                <div class="table-wrapper">
+                    <table class="member-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>이름</th>
+                            <th>이메일</th>
+                            <th>등록일</th>
+                            <th>거주지역</th>
+                            <th>관리</th>
+                        </tr>
+                        </thead>
+                        <tbody id="female-table-body">
+                        <tr class="empty-row">
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <p>조회된 회원이 없습니다.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 매칭 후보 영역 (여성 유저 선택 시 표시) -->
+            <section class="table-section" id="matching-candidates-section" style="display: none; margin-top: 30px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="color: #2d3748;">
+                        매칭 후보: <span id="selected-female-name"></span>
+                    </h2>
+                    <button id="back-to-female-list" class="btn btn-cancel">목록으로</button>
+                </div>
+                <div class="table-wrapper">
+                    <table class="member-table">
+                        <thead>
+                        <tr>
+                            <th width="50">
+                                <input type="checkbox" id="select-all-males">
+                            </th>
+                            <th>ID</th>
+                            <th>이름</th>
+                            <th>이메일</th>
+                            <th>키</th>
+                            <th>몸무게</th>
+                            <th>거주지역</th>
+                            <th>매칭 점수</th>
+                        </tr>
+                        </thead>
+                        <tbody id="matching-candidates-body">
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 20px; text-align: right;">
+                    <button id="create-matching-btn" class="btn btn-primary" disabled>
+                        매칭 확정 (선택된 남성: <span id="selected-male-count">0</span>/3)
+                    </button>
+                </div>
+            </section>
+        </div>
     </main>
+</div>
+
+<!-- 유저 상세 정보 모달 -->
+<div id="member-detail-modal" class="modal">
+    <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header">
+            <h3>유저 상세 정보</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="member-detail-content">
+                <!-- 상세 정보가 여기에 동적으로 추가됩니다 -->
+            </div>
+        </div>
+        <div class="modal-footer" id="member-detail-footer">
+            <!-- 상태 변경 버튼이 여기에 동적으로 추가됩니다 -->
+        </div>
+    </div>
 </div>
 
 <!-- 상태 변경 모달 -->
@@ -132,10 +182,7 @@
             <div class="modal-form">
                 <label for="new-status">새로운 상태</label>
                 <select id="new-status" class="modal-select">
-                    <option value="PENDING_APPROVAL">승인대기</option>
-                    <option value="APPROVED">승인완료</option>
                     <option value="CONNECTING">연결중</option>
-                    <option value="CONNECTED">연결됨</option>
                     <option value="BLACKLISTED">블랙 유저</option>
                 </select>
             </div>
@@ -143,6 +190,28 @@
         <div class="modal-footer">
             <button class="btn btn-cancel" id="modal-cancel">취소</button>
             <button class="btn btn-primary" id="modal-confirm">변경</button>
+        </div>
+    </div>
+</div>
+
+<!-- 매칭 확인 모달 -->
+<div id="matching-confirm-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>매칭 확정</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-member-info">
+                <strong id="confirm-female-name"></strong> 님과 선택된 남성 유저 3명을 매칭하시겠습니까?
+            </p>
+            <div id="confirm-male-names" style="margin-top: 15px; padding: 15px; background: #f7fafc; border-radius: 8px;">
+                <!-- 선택된 남성 유저 이름이 여기에 표시됩니다 -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-cancel" id="matching-cancel">취소</button>
+            <button class="btn btn-primary" id="matching-confirm">확인</button>
         </div>
     </div>
 </div>

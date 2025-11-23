@@ -1,171 +1,164 @@
 // 전역 변수
-let currentGender = 'FEMALE';
-let currentPage = 1;
-let currentFilters = {
-    status: '',
-    dateSort: 'desc',
-    search: ''
-};
+let currentTab = 'approval'; // 'approval' 또는 'matching'
+let selectedMemberId = null;
+let selectedFemaleMemberId = null;
+let selectedMaleMemberIds = [];
+let matchingCandidates = [];
+
+// API Base URL
+const API_BASE_URL = '/admin/members';
 
 // DOM 로드 완료 후 실행
 document.addEventListener('DOMContentLoaded', function() {
     initializeEventListeners();
-    loadMembers();
+    loadApprovalMembers();
 });
 
 // 이벤트 리스너 초기화
 function initializeEventListeners() {
     // 탭 전환
-    const navTabs = document.querySelectorAll('.nav-tab');
-    navTabs.forEach(tab => {
+    document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.addEventListener('click', function() {
-            const gender = this.dataset.gender;
-            switchTab(gender);
+            const tabType = this.dataset.tab;
+            switchTab(tabType);
         });
-    });
-
-    // 필터 변경
-    document.getElementById('status-filter').addEventListener('change', function() {
-        currentFilters.status = this.value;
-        currentPage = 1;
-        loadMembers();
-    });
-
-    document.getElementById('date-sort').addEventListener('change', function() {
-        currentFilters.dateSort = this.value;
-        currentPage = 1;
-        loadMembers();
     });
 
     // 검색
     document.getElementById('search-btn').addEventListener('click', function() {
-        currentFilters.search = document.getElementById('search-input').value;
-        currentPage = 1;
-        loadMembers();
+        loadApprovalMembers();
     });
 
     document.getElementById('search-input').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
-            currentFilters.search = this.value;
-            currentPage = 1;
-            loadMembers();
+            loadApprovalMembers();
         }
     });
 
     // 필터 초기화
     document.getElementById('reset-filter').addEventListener('click', function() {
-        resetFilters();
-    });
-
-    // 페이지네이션
-    document.getElementById('prev-page').addEventListener('click', function() {
-        if (currentPage > 1) {
-            currentPage--;
-            loadMembers();
-        }
-    });
-
-    document.getElementById('next-page').addEventListener('click', function() {
-        currentPage++;
-        loadMembers();
+        document.getElementById('search-input').value = '';
+        loadApprovalMembers();
     });
 
     // 모달 관련
-    document.querySelector('.modal-close').addEventListener('click', closeModal);
-    document.getElementById('modal-cancel').addEventListener('click', closeModal);
+    document.querySelectorAll('.modal-close').forEach(closeBtn => {
+        closeBtn.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            modal.classList.remove('show');
+        });
+    });
+
+    document.getElementById('modal-cancel').addEventListener('click', function() {
+        document.getElementById('status-modal').classList.remove('show');
+    });
+
     document.getElementById('modal-confirm').addEventListener('click', confirmStatusChange);
 
-    // 모달 외부 클릭 시 닫기
-    document.getElementById('status-modal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeModal();
+    // 매칭 관련
+    document.getElementById('back-to-female-list').addEventListener('click', function() {
+        showFemaleList();
+    });
+
+    document.getElementById('select-all-males').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('#matching-candidates-body input[type="checkbox"]');
+        checkboxes.forEach(cb => {
+            cb.checked = this.checked;
+            if (this.checked) {
+                const memberId = parseInt(cb.dataset.memberId);
+                if (!selectedMaleMemberIds.includes(memberId)) {
+                    selectedMaleMemberIds.push(memberId);
+                }
+            } else {
+                selectedMaleMemberIds = [];
+            }
+        });
+        updateMatchingButton();
+    });
+
+    document.getElementById('create-matching-btn').addEventListener('click', function() {
+        if (selectedMaleMemberIds.length === 3) {
+            openMatchingConfirmModal();
         }
+    });
+
+    document.getElementById('matching-cancel').addEventListener('click', function() {
+        document.getElementById('matching-confirm-modal').classList.remove('show');
+    });
+
+    document.getElementById('matching-confirm').addEventListener('click', createMatching);
+
+    // 모달 외부 클릭 시 닫기
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('show');
+            }
+        });
     });
 }
 
 // 탭 전환
-function switchTab(gender) {
-    currentGender = gender;
-    currentPage = 1;
-
+function switchTab(tabType) {
+    currentTab = tabType;
+    
     // 탭 활성화 상태 변경
     document.querySelectorAll('.nav-tab').forEach(tab => {
         tab.classList.remove('active');
-        if (tab.dataset.gender === gender) {
+        if (tab.dataset.tab === tabType) {
             tab.classList.add('active');
         }
     });
 
-    // 타이틀 변경
-    const title = gender === 'FEMALE' ? '일본 여자' : '한국 남자';
-    document.getElementById('current-tab-title').textContent = `${title} 회원 관리`;
+    // 콘텐츠 표시/숨김
+    document.getElementById('approval-tab-content').classList.toggle('active', tabType === 'approval');
+    document.getElementById('matching-tab-content').classList.toggle('active', tabType === 'matching');
 
-    // 필터 초기화
-    resetFilters();
+    // 타이틀 변경
+    const title = tabType === 'approval' ? '유저 승인' : '유저 매칭';
+    document.getElementById('current-tab-title').textContent = title;
 
     // 데이터 로드
-    loadMembers();
-}
-
-// 필터 초기화
-function resetFilters() {
-    currentFilters = {
-        status: '',
-        dateSort: 'desc',
-        search: ''
-    };
-
-    document.getElementById('status-filter').value = '';
-    document.getElementById('date-sort').value = 'desc';
-    document.getElementById('search-input').value = '';
-
-    currentPage = 1;
-    loadMembers();
-}
-
-// 회원 데이터 로드 (실제 API 호출 부분)
-function loadMembers() {
-    // TODO: 실제 API 호출로 대체
-    // 예시: fetch(`/api/admin/members?gender=${currentGender}&status=${currentFilters.status}...`)
-
-    // 임시 더미 데이터
-    const dummyData = generateDummyData();
-    renderMemberTable(dummyData);
-    updatePagination(dummyData.totalPages);
-    updateTotalCount(dummyData.totalCount);
-}
-
-// 더미 데이터 생성 (테스트용)
-function generateDummyData() {
-    const statuses = ['PENDING_APPROVAL', 'APPROVED', 'CONNECTING', 'CONNECTED', 'BLACKLISTED'];
-    const names = currentGender === 'FEMALE'
-        ? ['사쿠라', '유키', '아야', '미사키', '하루카']
-        : ['민수', '지훈', '현우', '태양', '준호'];
-
-    const members = [];
-    for (let i = 1; i <= 10; i++) {
-        members.push({
-            id: i,
-            name: names[Math.floor(Math.random() * names.length)],
-            email: `user${i}@example.com`,
-            status: statuses[Math.floor(Math.random() * statuses.length)],
-            createdAt: new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-            residenceArea: currentGender === 'FEMALE' ? '도쿄' : '서울'
-        });
+    if (tabType === 'approval') {
+        loadApprovalMembers();
+    } else {
+        loadConnectingFemaleMembers();
     }
-
-    return {
-        members: members,
-        totalPages: 5,
-        totalCount: 47
-    };
 }
 
-// 테이블 렌더링
-function renderMemberTable(data) {
-    const tbody = document.getElementById('member-table-body');
+// ==================== 유저 승인 탭 ====================
 
-    if (data.members.length === 0) {
+/**
+ * Use Case 1: 승인 대기 유저 목록 조회
+ */
+async function loadApprovalMembers() {
+    try {
+        const keyword = document.getElementById('search-input').value.trim();
+        const url = keyword 
+            ? `${API_BASE_URL}/pending-approval?keyword=${encodeURIComponent(keyword)}`
+            : `${API_BASE_URL}/pending-approval`;
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('승인 대기 유저 목록 조회 실패');
+        }
+        
+        const members = await response.json();
+        renderApprovalTable(members);
+        updateTotalCount(members.length);
+    } catch (error) {
+        console.error('승인 대기 유저 목록 조회 오류:', error);
+        showError('승인 대기 유저 목록을 불러오는데 실패했습니다.');
+    }
+}
+
+/**
+ * 승인 대기 유저 테이블 렌더링
+ */
+function renderApprovalTable(members) {
+    const tbody = document.getElementById('approval-table-body');
+    
+    if (members.length === 0) {
         tbody.innerHTML = `
             <tr class="empty-row">
                 <td colspan="7">
@@ -177,11 +170,15 @@ function renderMemberTable(data) {
         `;
         return;
     }
-
-    tbody.innerHTML = data.members.map(member => `
+    
+    tbody.innerHTML = members.map(member => `
         <tr>
             <td>${member.id}</td>
-            <td>${member.name}</td>
+            <td>
+                <a href="#" class="member-name-link" onclick="openMemberDetail(${member.id}); return false;">
+                    ${member.name}
+                </a>
+            </td>
             <td>${member.email}</td>
             <td>
                 <span class="status-badge ${getStatusClass(member.status)}">
@@ -189,7 +186,7 @@ function renderMemberTable(data) {
                 </span>
             </td>
             <td>${formatDate(member.createdAt)}</td>
-            <td>${member.residenceArea}</td>
+            <td>${member.residenceArea || '-'}</td>
             <td>
                 <button class="action-btn" onclick="openStatusModal(${member.id}, '${member.name}', '${member.status}')">
                     상태 변경
@@ -199,7 +196,374 @@ function renderMemberTable(data) {
     `).join('');
 }
 
-// 상태 CSS 클래스 반환
+/**
+ * Use Case 1: 유저 상세 정보 조회
+ */
+async function openMemberDetail(memberId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/${memberId}`);
+        if (!response.ok) {
+            throw new Error('유저 상세 정보 조회 실패');
+        }
+        
+        const member = await response.json();
+        renderMemberDetail(member);
+        document.getElementById('member-detail-modal').classList.add('show');
+    } catch (error) {
+        console.error('유저 상세 정보 조회 오류:', error);
+        showError('유저 상세 정보를 불러오는데 실패했습니다.');
+    }
+}
+
+/**
+ * 유저 상세 정보 렌더링
+ */
+function renderMemberDetail(member) {
+    const content = document.getElementById('member-detail-content');
+    const footer = document.getElementById('member-detail-footer');
+    
+    content.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <h4 style="margin-bottom: 10px; color: #667eea;">기본 정보</h4>
+                <p><strong>ID:</strong> ${member.id}</p>
+                <p><strong>이름:</strong> ${member.name}</p>
+                <p><strong>이메일:</strong> ${member.email}</p>
+                <p><strong>상태:</strong> <span class="status-badge ${getStatusClass(member.status)}">${getStatusText(member.status)}</span></p>
+                <p><strong>성별:</strong> ${member.gender === 'JAPANESE_FEMALE' ? '일본 여성' : '한국 남성'}</p>
+                <p><strong>등록일:</strong> ${formatDate(member.createdAt)}</p>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 10px; color: #667eea;">신체 정보</h4>
+                <p><strong>키:</strong> ${member.height || '-'} cm</p>
+                <p><strong>몸무게:</strong> ${member.weight || '-'} kg</p>
+                <p><strong>거주지역:</strong> ${member.residenceArea || '-'}</p>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 10px; color: #667eea;">기타 정보</h4>
+                <p><strong>흡연:</strong> ${member.smokingStatus ? getSmokingText(member.smokingStatus) : '-'}</p>
+                <p><strong>음주:</strong> ${member.drinkingFrequency ? getDrinkingText(member.drinkingFrequency) : '-'}</p>
+                <p><strong>종교:</strong> ${member.religion ? getReligionText(member.religion) : '-'}</p>
+                ${member.religionOther ? `<p><strong>종교 기타:</strong> ${member.religionOther}</p>` : ''}
+                <p><strong>학력:</strong> ${member.education ? getEducationText(member.education) : '-'}</p>
+                <p><strong>자산:</strong> ${member.asset ? getAssetText(member.asset) : '-'}</p>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 10px; color: #667eea;">추가 정보</h4>
+                <p><strong>기타 정보:</strong> ${member.otherInfo || '-'}</p>
+                ${member.profileImageUrl ? `<p><strong>프로필 이미지:</strong> <a href="${member.profileImageUrl}" target="_blank">보기</a></p>` : ''}
+            </div>
+        </div>
+    `;
+    
+    // 승인 대기 상태인 경우에만 상태 변경 버튼 표시
+    if (member.status === 'PENDING_APPROVAL') {
+        footer.innerHTML = `
+            <button class="btn btn-primary" onclick="openStatusModal(${member.id}, '${member.name}', '${member.status}')">
+                상태 변경
+            </button>
+        `;
+    } else {
+        footer.innerHTML = '';
+    }
+}
+
+/**
+ * Use Case 2: 상태 변경 모달 열기
+ */
+function openStatusModal(memberId, memberName, currentStatus) {
+    selectedMemberId = memberId;
+    document.getElementById('modal-member-name').textContent = memberName;
+    
+    // 승인 대기 상태인 경우에만 연결중/블랙유저 선택 가능
+    const statusSelect = document.getElementById('new-status');
+    statusSelect.innerHTML = '';
+    if (currentStatus === 'PENDING_APPROVAL') {
+        statusSelect.innerHTML = `
+            <option value="CONNECTING">연결중</option>
+            <option value="BLACKLISTED">블랙 유저</option>
+        `;
+    }
+    
+    document.getElementById('status-modal').classList.add('show');
+}
+
+/**
+ * Use Case 2: 상태 변경 확인
+ */
+async function confirmStatusChange() {
+    if (!selectedMemberId) return;
+    
+    const newStatus = document.getElementById('new-status').value;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/${selectedMemberId}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({ message: '상태 변경 실패' }));
+            throw new Error(error.message || '상태 변경 실패');
+        }
+        
+        showSuccess('상태가 변경되었습니다.');
+        document.getElementById('status-modal').classList.remove('show');
+        selectedMemberId = null;
+        
+        // 목록 새로고침
+        if (currentTab === 'approval') {
+            loadApprovalMembers();
+        }
+    } catch (error) {
+        console.error('상태 변경 오류:', error);
+        showError(error.message || '상태 변경에 실패했습니다.');
+    }
+}
+
+// ==================== 유저 매칭 탭 ====================
+
+/**
+ * Use Case 3: 연결중 상태 여성 유저 목록 조회
+ */
+async function loadConnectingFemaleMembers() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/connecting/females`);
+        if (!response.ok) {
+            throw new Error('연결중 여성 유저 목록 조회 실패');
+        }
+        
+        const members = await response.json();
+        renderFemaleTable(members);
+        updateTotalCount(members.length);
+    } catch (error) {
+        console.error('연결중 여성 유저 목록 조회 오류:', error);
+        showError('연결중 여성 유저 목록을 불러오는데 실패했습니다.');
+    }
+}
+
+/**
+ * 연결중 여성 유저 테이블 렌더링
+ */
+function renderFemaleTable(members) {
+    const tbody = document.getElementById('female-table-body');
+    
+    if (members.length === 0) {
+        tbody.innerHTML = `
+            <tr class="empty-row">
+                <td colspan="6">
+                    <div class="empty-state">
+                        <p>조회된 회원이 없습니다.</p>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = members.map(member => `
+        <tr>
+            <td>${member.id}</td>
+            <td>
+                <a href="#" class="member-name-link" onclick="selectFemaleMember(${member.id}, '${member.name}'); return false;">
+                    ${member.name}
+                </a>
+            </td>
+            <td>${member.email}</td>
+            <td>${formatDate(member.createdAt)}</td>
+            <td>${member.residenceArea || '-'}</td>
+            <td>
+                <button class="action-btn" onclick="selectFemaleMember(${member.id}, '${member.name}')">
+                    매칭 후보 보기
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+/**
+ * Use Case 4: 여성 유저 선택 및 매칭 후보 조회
+ */
+async function selectFemaleMember(femaleId, femaleName) {
+    selectedFemaleMemberId = femaleId;
+    document.getElementById('selected-female-name').textContent = femaleName;
+    
+    try {
+        showLoading('매칭 후보를 조회하는 중...');
+        
+        const response = await fetch(`${API_BASE_URL}/${femaleId}/matching-candidates`);
+        if (!response.ok) {
+            throw new Error('매칭 후보 조회 실패');
+        }
+        
+        matchingCandidates = await response.json();
+        
+        if (matchingCandidates.length === 0) {
+            showError('현재 조건에 맞는 남성 유저가 없습니다.');
+            return;
+        }
+        
+        renderMatchingCandidates(matchingCandidates);
+        showMatchingCandidatesSection();
+        hideLoading();
+    } catch (error) {
+        console.error('매칭 후보 조회 오류:', error);
+        showError('매칭 후보를 불러오는데 실패했습니다.');
+        hideLoading();
+    }
+}
+
+/**
+ * 매칭 후보 테이블 렌더링
+ */
+function renderMatchingCandidates(candidates) {
+    const tbody = document.getElementById('matching-candidates-body');
+    selectedMaleMemberIds = [];
+    
+    tbody.innerHTML = candidates.map(candidate => `
+        <tr>
+            <td>
+                <input type="checkbox" 
+                       data-member-id="${candidate.memberId}"
+                       onchange="toggleMaleSelection(${candidate.memberId}, this.checked)">
+            </td>
+            <td>${candidate.memberId}</td>
+            <td>${candidate.name}</td>
+            <td>${candidate.email}</td>
+            <td>${candidate.height || '-'} cm</td>
+            <td>${candidate.weight || '-'} kg</td>
+            <td>${candidate.residenceArea || '-'}</td>
+            <td>
+                <span class="score-badge" style="background: ${getScoreColor(candidate.matchingScore)}; color: white; padding: 4px 12px; border-radius: 12px; font-weight: 600;">
+                    ${candidate.matchingScore.toFixed(1)}점
+                </span>
+            </td>
+        </tr>
+    `).join('');
+    
+    updateMatchingButton();
+}
+
+/**
+ * 남성 유저 선택 토글
+ */
+function toggleMaleSelection(memberId, checked) {
+    if (checked) {
+        if (selectedMaleMemberIds.length >= 3) {
+            event.target.checked = false;
+            showError('남성 유저는 최대 3명까지만 선택할 수 있습니다.');
+            return;
+        }
+        if (!selectedMaleMemberIds.includes(memberId)) {
+            selectedMaleMemberIds.push(memberId);
+        }
+    } else {
+        selectedMaleMemberIds = selectedMaleMemberIds.filter(id => id !== memberId);
+    }
+    updateMatchingButton();
+}
+
+/**
+ * 매칭 버튼 상태 업데이트
+ */
+function updateMatchingButton() {
+    const btn = document.getElementById('create-matching-btn');
+    const count = document.getElementById('selected-male-count');
+    count.textContent = selectedMaleMemberIds.length;
+    
+    if (selectedMaleMemberIds.length === 3) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+    } else {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+    }
+}
+
+/**
+ * 매칭 후보 섹션 표시
+ */
+function showMatchingCandidatesSection() {
+    document.getElementById('female-list-section').style.display = 'none';
+    document.getElementById('matching-candidates-section').style.display = 'block';
+}
+
+/**
+ * 여성 유저 목록으로 돌아가기
+ */
+function showFemaleList() {
+    document.getElementById('female-list-section').style.display = 'block';
+    document.getElementById('matching-candidates-section').style.display = 'none';
+    selectedFemaleMemberId = null;
+    selectedMaleMemberIds = [];
+    matchingCandidates = [];
+}
+
+/**
+ * Use Case 5: 매칭 확인 모달 열기
+ */
+function openMatchingConfirmModal() {
+    const femaleName = document.getElementById('selected-female-name').textContent;
+    const selectedMales = matchingCandidates.filter(c => selectedMaleMemberIds.includes(c.memberId));
+    
+    document.getElementById('confirm-female-name').textContent = femaleName;
+    document.getElementById('confirm-male-names').innerHTML = `
+        <strong>선택된 남성 유저:</strong>
+        <ul style="margin-top: 10px; padding-left: 20px;">
+            ${selectedMales.map(m => `<li>${m.name} (${m.matchingScore.toFixed(1)}점)</li>`).join('')}
+        </ul>
+    `;
+    
+    document.getElementById('matching-confirm-modal').classList.add('show');
+}
+
+/**
+ * Use Case 5: 매칭 생성
+ */
+async function createMatching() {
+    if (selectedMaleMemberIds.length !== 3) {
+        showError('남성 유저 3명을 선택해주세요.');
+        return;
+    }
+    
+    try {
+        showLoading('매칭을 생성하는 중...');
+        
+        const response = await fetch(`${API_BASE_URL}/matching`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                femaleMemberId: selectedFemaleMemberId,
+                maleMemberIds: selectedMaleMemberIds
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({ message: '매칭 생성 실패' }));
+            throw new Error(error.message || '매칭 생성 실패');
+        }
+        
+        hideLoading();
+        showSuccess('매칭이 성공적으로 생성되었습니다.');
+        document.getElementById('matching-confirm-modal').classList.remove('show');
+        
+        // 목록 새로고침
+        showFemaleList();
+        loadConnectingFemaleMembers();
+    } catch (error) {
+        console.error('매칭 생성 오류:', error);
+        hideLoading();
+        showError(error.message || '매칭 생성에 실패했습니다.');
+    }
+}
+
+// ==================== 유틸리티 함수 ====================
+
 function getStatusClass(status) {
     const statusMap = {
         'PENDING_APPROVAL': 'status-pending',
@@ -211,7 +575,6 @@ function getStatusClass(status) {
     return statusMap[status] || '';
 }
 
-// 상태 텍스트 반환
 function getStatusText(status) {
     const statusMap = {
         'PENDING_APPROVAL': '승인대기',
@@ -223,86 +586,87 @@ function getStatusText(status) {
     return statusMap[status] || status;
 }
 
-// 날짜 포맷팅
-function formatDate(date) {
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
+function getSmokingText(status) {
+    const map = { 'SMOKER': '흡연', 'NON_SMOKER': '비흡연' };
+    return map[status] || status;
+}
+
+function getDrinkingText(frequency) {
+    const map = {
+        'LESS_THAN_ONCE_A_WEEK': '주 1회 미만',
+        'ONCE_A_WEEK': '주 1회',
+        'TWICE_A_WEEK': '주 2회',
+        'MORE_THAN_THREE_TIMES_A_WEEK': '주 3회 이상'
+    };
+    return map[frequency] || frequency;
+}
+
+function getReligionText(religion) {
+    const map = {
+        'NONE': '무교',
+        'BUDDHISM': '불교',
+        'CHRISTIANITY': '기독교',
+        'CATHOLICISM': '천주교',
+        'SHINTO': '신토',
+        'OTHER': '기타'
+    };
+    return map[religion] || religion;
+}
+
+function getEducationText(education) {
+    const map = {
+        'HIGH_SCHOOL': '고등학교 졸업',
+        'ASSOCIATE_DEGREE': '전문학사',
+        'BACHELOR_DEGREE': '학사',
+        'MASTER_DEGREE': '석사',
+        'DOCTORATE_DEGREE': '박사'
+    };
+    return map[education] || education;
+}
+
+function getAssetText(asset) {
+    const map = {
+        'UNDER_100M': '1억 미만',
+        'BETWEEN_100M_300M': '1억-3억',
+        'BETWEEN_300M_500M': '3억-5억',
+        'BETWEEN_500M_1B': '5억-10억',
+        'OVER_1B': '10억 초과'
+    };
+    return map[asset] || asset;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
 
-// 페이지네이션 업데이트
-function updatePagination(totalPages) {
-    const pageNumbers = document.getElementById('page-numbers');
-    const prevBtn = document.getElementById('prev-page');
-    const nextBtn = document.getElementById('next-page');
-
-    // 이전/다음 버튼 상태
-    prevBtn.disabled = currentPage === 1;
-    nextBtn.disabled = currentPage === totalPages;
-
-    // 페이지 번호 생성
-    let pageHTML = '';
-    const maxPages = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
-    let endPage = Math.min(totalPages, startPage + maxPages - 1);
-
-    if (endPage - startPage < maxPages - 1) {
-        startPage = Math.max(1, endPage - maxPages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-        pageHTML += `
-            <button class="page-number ${i === currentPage ? 'active' : ''}" 
-                    onclick="goToPage(${i})">
-                ${i}
-            </button>
-        `;
-    }
-
-    pageNumbers.innerHTML = pageHTML;
+function getScoreColor(score) {
+    if (score >= 80) return '#10b981'; // green
+    if (score >= 60) return '#3b82f6'; // blue
+    if (score >= 40) return '#f59e0b'; // yellow
+    return '#ef4444'; // red
 }
 
-// 페이지 이동
-function goToPage(page) {
-    currentPage = page;
-    loadMembers();
-}
-
-// 전체 회원 수 업데이트
 function updateTotalCount(count) {
     document.getElementById('total-count').textContent = count;
 }
 
-// 상태 변경 모달 열기
-let selectedMemberId = null;
-
-function openStatusModal(memberId, memberName, currentStatus) {
-    selectedMemberId = memberId;
-    document.getElementById('modal-member-name').textContent = memberName;
-    document.getElementById('new-status').value = currentStatus;
-    document.getElementById('status-modal').classList.add('show');
+function showSuccess(message) {
+    alert('✅ ' + message);
 }
 
-// 모달 닫기
-function closeModal() {
-    document.getElementById('status-modal').classList.remove('show');
-    selectedMemberId = null;
+function showError(message) {
+    alert('❌ ' + message);
 }
 
-// 상태 변경 확인
-function confirmStatusChange() {
-    const newStatus = document.getElementById('new-status').value;
+function showLoading(message) {
+    // 간단한 로딩 표시 (필요시 개선 가능)
+    console.log('Loading: ' + message);
+}
 
-    if (!selectedMemberId) return;
-
-    // TODO: 실제 API 호출로 대체
-    console.log(`회원 ${selectedMemberId}의 상태를 ${newStatus}로 변경`);
-
-    // 임시: 알림 표시
-    alert('상태가 변경되었습니다.');
-
-    closeModal();
-    loadMembers();
+function hideLoading() {
+    console.log('Loading finished');
 }
