@@ -2,6 +2,8 @@ package masil.backend.modules.member.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import java.util.List;
 import masil.backend.modules.member.enums.Asset;
 import masil.backend.modules.member.enums.DrinkingFrequency;
 import masil.backend.modules.member.enums.Education;
@@ -50,7 +52,13 @@ public record SignUpRequest(
 
     Asset asset,
 
+    @Size(max = 300, message = "기타 정보는 최대 300자까지 입력 가능합니다.")
     String otherInfo,
 
-    String profileImageUrl
+    @NotNull(message = "프로필 사진을 최소 1장 이상 등록해주세요.")
+    @Size(min = 1, message = "프로필 사진을 최소 1장 이상 등록해주세요.")
+    List<String> profileImageUrls,
+
+    @NotNull(message = "썸네일 이미지를 지정해주세요.")
+    String thumbnailImageUrl
 ){}

@@ -81,9 +81,6 @@ public class Member extends BaseEntity {
     @Column
     private Religion religion;
 
-    @Column
-    private String religionOther; // 종교 - 기타 입력값
-
     /** 선택 정보들**/
     @Enumerated(EnumType.STRING)
     @Column
@@ -104,7 +101,7 @@ public class Member extends BaseEntity {
                    final Provider provider, final String providerId,
                    final Gender gender, final Integer height, final Integer weight,
                    final String residenceArea, final SmokingStatus smokingStatus,
-                   final DrinkingFrequency drinkingFrequency, final Religion religion, final String religionOther,
+                   final DrinkingFrequency drinkingFrequency, final Religion religion,
                    final Education education, final Asset asset, final String otherInfo,
                    final String profileImageUrl) {
         this.name = name;
@@ -119,7 +116,6 @@ public class Member extends BaseEntity {
         this.smokingStatus = smokingStatus;
         this.drinkingFrequency = drinkingFrequency;
         this.religion = religion;
-        this.religionOther = religionOther;
         this.education = education;
         this.asset = asset;
         this.otherInfo = otherInfo;

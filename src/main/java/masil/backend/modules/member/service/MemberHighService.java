@@ -27,8 +27,6 @@ public class MemberHighService {
     private final PasswordEncoder passwordEncoder;
 
     public void signUp(final SignUpRequest signUpRequest) {
-        validateReligionOther(signUpRequest.religion(), signUpRequest.religionOther());
-
         final String encodedPassword = passwordEncoder.encode(signUpRequest.password());
 
         memberLowService.checkIsDuplicateEmail(signUpRequest.email());
@@ -73,11 +71,5 @@ public class MemberHighService {
 
     private String getToken(final Long memberId, final String name) {
         return jwtProvider.createToken(String.valueOf(memberId), name);
-    }
-
-    private void validateReligionOther(final Religion religion, final String religionOther) {
-        if (religion == Religion.OTHER && (religionOther == null || religionOther.isBlank())) {
-            throw new MemberException(MEMBER_RELIGION_OTHER_FAILED);
-        }
     }
 }
