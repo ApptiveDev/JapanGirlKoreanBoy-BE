@@ -124,6 +124,32 @@ public class Member extends BaseEntity {
         this.status = MemberStatus.PENDING_APPROVAL;
     }
 
+    public void updateProfile(
+            final Gender gender,
+            final Integer height,
+            final Integer weight,
+            final String residenceArea,
+            final SmokingStatus smokingStatus,
+            final DrinkingFrequency drinkingFrequency,
+            final Religion religion,
+            final Education education,
+            final Asset asset,
+            final String otherInfo,
+            final String profileImageUrl
+    ) {
+        this.gender = gender;
+        this.height = height;
+        this.weight = weight;
+        this.residenceArea = residenceArea;
+        this.smokingStatus = smokingStatus;
+        this.drinkingFrequency = drinkingFrequency;
+        this.religion = religion;
+        this.education = education;
+        this.asset = asset;
+        this.otherInfo = otherInfo;
+        this.profileImageUrl = profileImageUrl;
+    }
+
     public void updatePassword(final String newPassword) {
         this.password = newPassword;
     }

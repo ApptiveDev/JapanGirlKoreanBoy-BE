@@ -2,9 +2,6 @@ package masil.backend.modules.member.enums;
 
 import lombok.Getter;
 
-/**
- * 흡연 상태 Enum
- */
 @Getter
 public enum SmokingStatus {
     SMOKER("흡연"),
