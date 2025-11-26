@@ -90,13 +90,16 @@ public class Member extends BaseEntity {
     @Column
     private String profileImageUrl;
 
+    @Column(columnDefinition = "TEXT")
+    private String aiSummary;
+
     @Builder
     private Member(
             final Long id, final Provider provider, final String providerId,
             final String name, final String email, final String password,
             final Gender gender, final Integer height, final Integer weight, final String residenceArea,
             final SmokingStatus smokingStatus, final DrinkingFrequency drinkingFrequency, final Religion religion,
-            final Education education, final Asset asset, final String otherInfo, final String profileImageUrl
+            final Education education, final Asset asset, final String otherInfo, final String profileImageUrl, final String aiSummary
     ) {
         this.id = id;
         this.provider = provider != null ? provider : Provider.LOCAL;
@@ -117,6 +120,7 @@ public class Member extends BaseEntity {
         this.asset = asset;
         this.otherInfo = otherInfo;
         this.profileImageUrl = profileImageUrl;
+        this.aiSummary = aiSummary;
     }
 
     public void updateProfile(
@@ -143,6 +147,10 @@ public class Member extends BaseEntity {
         this.asset = asset;
         this.otherInfo = otherInfo;
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateAiSummary(final String aiSummary) {
+        this.aiSummary = aiSummary;
     }
 
     public void updatePassword(final String newPassword) {

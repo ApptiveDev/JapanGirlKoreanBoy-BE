@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberPreferenceHighService {
     private final MemberPreferenceLowService memberPreferenceLowService;
     private final MemberLowService memberLowService;
+    private final MemberAiService memberAiService;
 
     public void saveMemberPreference(
             final Long memberId,
@@ -50,6 +51,8 @@ public class MemberPreferenceHighService {
                 request.mbti1(), request.mbti2(), request.mbti3(), request.mbti4(),
                 request.priority1(), request.priority2(), request.priority3()
         );
+
+        memberAiService.generateMemberSummary(memberId, request.otherInfo());
     }
 
     @Transactional(readOnly = true)
