@@ -11,8 +11,7 @@ public enum Religion {
     BUDDHISM(2, "불교"),
     CHRISTIANITY(4, "기독교"),
     CATHOLICISM(8, "천주교"),
-    SHINTO(16, "신토"),  // 추가!
-    OTHER(32, "기타");
+    TAOISM(16, "도교");
 
     private final int bitmask;
     private final String displayName;
