@@ -36,7 +36,7 @@ public class MemberHighService {
         final Member member =  memberLowService.getValidateExistMemberByEmail(signInRequest.email());
         checkCorrectPassword(member.getPassword(), signInRequest.password());
         final String token = getToken(member.getId(), member.getName());
-        return new SignInResponse(member, token);
+        return new SignInResponse(member, token, member.getStatus());
     }
 
     @Transactional(readOnly = true)

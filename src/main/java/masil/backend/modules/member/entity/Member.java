@@ -1,6 +1,5 @@
 package masil.backend.modules.member.entity;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,12 +29,10 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Local : 일반 회원가입, Google : 구글 로그인
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Provider provider;
 
-    // 구글 로그인 시 발급받은 고유 아이디
     @Column
     private String providerId;
 
@@ -55,9 +52,7 @@ public class Member extends BaseEntity {
     @Column
     private String password;
 
-    /** 필수 정보들 **/
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Gender gender;
 
     @Column
@@ -81,7 +76,6 @@ public class Member extends BaseEntity {
     @Column
     private Religion religion;
 
-    /** 선택 정보들**/
     @Enumerated(EnumType.STRING)
     @Column
     private Education education;
@@ -97,18 +91,21 @@ public class Member extends BaseEntity {
     private String profileImageUrl;
 
     @Builder
-    private Member(final String name, final String email, final String password, 
-                   final Provider provider, final String providerId,
-                   final Gender gender, final Integer height, final Integer weight,
-                   final String residenceArea, final SmokingStatus smokingStatus,
-                   final DrinkingFrequency drinkingFrequency, final Religion religion,
-                   final Education education, final Asset asset, final String otherInfo,
-                   final String profileImageUrl) {
+    private Member(
+            final Long id, final Provider provider, final String providerId,
+            final String name, final String email, final String password,
+            final Gender gender, final Integer height, final Integer weight, final String residenceArea,
+            final SmokingStatus smokingStatus, final DrinkingFrequency drinkingFrequency, final Religion religion,
+            final Education education, final Asset asset, final String otherInfo, final String profileImageUrl
+    ) {
+        this.id = id;
+        this.provider = provider != null ? provider : Provider.LOCAL;
+        this.providerId = providerId;
+        this.isDeleted = false;
+        this.status = MemberStatus.PENDING_APPROVAL;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.provider = provider;
-        this.providerId = providerId;
         this.gender = gender;
         this.height = height;
         this.weight = weight;
@@ -120,8 +117,6 @@ public class Member extends BaseEntity {
         this.asset = asset;
         this.otherInfo = otherInfo;
         this.profileImageUrl = profileImageUrl;
-        this.isDeleted = false;
-        this.status = MemberStatus.PENDING_APPROVAL;
     }
 
     public void updateProfile(
@@ -164,5 +159,11 @@ public class Member extends BaseEntity {
 
     public void blacklist() {
         this.status = MemberStatus.BLACKLISTED;
+    }
+
+    public boolean isProfileComplete() {
+        return gender != null && height != null && weight != null
+                && residenceArea != null && smokingStatus != null
+                && drinkingFrequency != null && religion != null;
     }
 }
