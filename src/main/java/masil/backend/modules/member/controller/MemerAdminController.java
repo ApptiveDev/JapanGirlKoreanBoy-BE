@@ -48,9 +48,10 @@ public class MemerAdminController {
         return ResponseEntity.ok().build();
     }
     
+
     @GetMapping("/connecting/females")
     public ResponseEntity<List<AdminMemberListResponse>> getConnectingFemaleMembers() {
-        log.info("연결중 상태 여성 유저 목록 조회 요청");
+        log.info("승인완료 상태 여성 유저 목록 조회 요청");
         List<AdminMemberListResponse> members = adminService.getConnectingFemaleMembers();
         return ResponseEntity.ok(members);
     }

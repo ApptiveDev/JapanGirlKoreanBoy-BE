@@ -62,39 +62,34 @@ public class AdminService {
     
 
     //Use Case 2: 승인대기 유저 상태 변경
-    // 승인대기 → 연결중 또는 블랙유저
+    // 승인대기 → 승인완료료 또는 블랙유저
 
     public void changeMemberStatus(Long memberId, ChangeMemberStatusRequest request) {
         Member member = memberLowService.getValidateExistMemberById(memberId);
         
         // 승인 대기 상태가 아니면 에러
         if (member.getStatus() != MemberStatus.PENDING_APPROVAL) {
-            log.warn("승인 대기 상태가 아닌 유저의 상태 변경 시도: memberId={}, 현재 상태={}", 
-                    memberId, member.getStatus());
             throw new IllegalArgumentException("승인 대기 상태의 유저만 상태를 변경할 수 있습니다.");
         }
         
         // 연결중 또는 블랙유저로만 변경 가능
-        if (request.status() != MemberStatus.CONNECTING && request.status() != MemberStatus.BLACKLISTED) {
+        if (request.status() != MemberStatus.APPROVED && request.status() != MemberStatus.BLACKLISTED) {
             throw new IllegalArgumentException("승인 대기 상태의 유저는 '연결중' 또는 '블랙유저' 상태로만 변경할 수 있습니다.");
         }
         
         member.changeStatus(request.status());
-        log.info("유저 상태 변경 완료: memberId={}, 변경 상태={}", memberId, request.status());
     }
     
 
-    //Use Case 3: 연결중 상태 여성 유저 목록 조회
+    //Use Case 3: 승인완료료 상태 여성 유저 목록 조회
 
     @Transactional(readOnly = true)
     public List<AdminMemberListResponse> getConnectingFemaleMembers() {
         List<Member> members = memberRepository.findByGenderAndStatus(
                 Gender.JAPANESE_FEMALE, 
-                MemberStatus.CONNECTING
+                MemberStatus.APPROVED
         );
-        
-        log.info("연결중 상태 여성 유저 조회: {}명", members.size());
-        
+                
         return members.stream()
                 .map(AdminMemberListResponse::from)
                 .collect(Collectors.toList());
@@ -108,7 +103,7 @@ public class AdminService {
         Member femaleMember = memberLowService.getValidateExistMemberById(femaleMemberId);
         
         // 여성 유저가 연결중 상태인지 확인
-        if (femaleMember.getStatus() != MemberStatus.CONNECTING) {
+        if (femaleMember.getStatus() != MemberStatus.APPROVED) {
             throw new IllegalArgumentException("연결중 상태의 여성 유저만 매칭 후보를 조회할 수 있습니다.");
         }
         
@@ -120,7 +115,7 @@ public class AdminService {
         // 연결중 상태 남성 유저 조회
         List<Member> maleMembers = memberRepository.findByGenderAndStatus(
                 Gender.KOREAN_MALE,
-                MemberStatus.CONNECTING
+                MemberStatus.APPROVED
         );
         
         log.info("매칭 후보 조회: 여성 memberId={}, 남성 후보 수={}", femaleMemberId, maleMembers.size());
@@ -142,9 +137,7 @@ public class AdminService {
         // 여성 유저 조회 및 검증
         Member femaleMember = memberLowService.getValidateExistMemberById(request.femaleMemberId());
         
-        if (femaleMember.getStatus() != MemberStatus.CONNECTING) {
-            log.warn("연결중 상태가 아닌 여성 유저 매칭 시도: memberId={}, 상태={}", 
-                    request.femaleMemberId(), femaleMember.getStatus());
+        if (femaleMember.getStatus() != MemberStatus.APPROVED) {
             throw new IllegalArgumentException("연결중 상태의 여성 유저만 매칭할 수 있습니다.");
         }
         
@@ -161,8 +154,6 @@ public class AdminService {
                 .map(memberLowService::getValidateExistMemberById)
                 .peek(member -> {
                     if (member.getStatus() != MemberStatus.CONNECTING) {
-                        log.warn("연결중 상태가 아닌 남성 유저 매칭 시도: memberId={}, 상태={}", 
-                                member.getId(), member.getStatus());
                         throw new IllegalArgumentException(
                                 String.format("선택한 유저 중 매칭 불가 상태가 있습니다. (memberId: %d, 상태: %s)", 
                                         member.getId(), member.getStatus()));
@@ -184,9 +175,9 @@ public class AdminService {
             throw new IllegalArgumentException("중복된 남성 유저가 선택되었습니다.");
         }
         
-        // 상태 변경: 연결중 → 연결됨
-        femaleMember.changeToConnected();
-        maleMembers.forEach(Member::changeToConnected);
+        // 상태 변경: 승인완료 -> 연결중
+        femaleMember.changeToConnecting();
+        maleMembers.forEach(Member::changeToConnecting);
         
         log.info("매칭 생성 완료: 여성 memberId={}, 남성 memberIds={}", 
                 request.femaleMemberId(), 

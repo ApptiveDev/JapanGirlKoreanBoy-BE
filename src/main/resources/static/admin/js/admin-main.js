@@ -275,12 +275,12 @@ function openStatusModal(memberId, memberName, currentStatus) {
     selectedMemberId = memberId;
     document.getElementById('modal-member-name').textContent = memberName;
     
-    // 승인 대기 상태인 경우에만 연결중/블랙유저 선택 가능
+    // 승인 대기 상태인 경우 승인완료 또는 블랙유저 선택 가능
     const statusSelect = document.getElementById('new-status');
     statusSelect.innerHTML = '';
     if (currentStatus === 'PENDING_APPROVAL') {
         statusSelect.innerHTML = `
-            <option value="CONNECTING">연결중</option>
+            <option value="APPROVED">승인완료</option>
             <option value="BLACKLISTED">블랙 유저</option>
         `;
     }
@@ -327,26 +327,7 @@ async function confirmStatusChange() {
 // ==================== 유저 매칭 탭 ====================
 
 /**
- * Use Case 3: 연결중 상태 여성 유저 목록 조회
- */
-async function loadConnectingFemaleMembers() {
-    try {
-        const response = await fetch(`${API_BASE_URL}/connecting/females`);
-        if (!response.ok) {
-            throw new Error('연결중 여성 유저 목록 조회 실패');
-        }
-        
-        const members = await response.json();
-        renderFemaleTable(members);
-        updateTotalCount(members.length);
-    } catch (error) {
-        console.error('연결중 여성 유저 목록 조회 오류:', error);
-        showError('연결중 여성 유저 목록을 불러오는데 실패했습니다.');
-    }
-}
-
-/**
- * 연결중 여성 유저 테이블 렌더링
+ * 승인완료 여성 유저 테이블 렌더링
  */
 function renderFemaleTable(members) {
     const tbody = document.getElementById('female-table-body');
@@ -549,7 +530,7 @@ async function createMatching() {
         }
         
         hideLoading();
-        showSuccess('매칭이 성공적으로 생성되었습니다.');
+        showSuccess('매칭이 성공적으로 생성되었습니다. (승인완료 → 연결중)');
         document.getElementById('matching-confirm-modal').classList.remove('show');
         
         // 목록 새로고침
@@ -561,6 +542,7 @@ async function createMatching() {
         showError(error.message || '매칭 생성에 실패했습니다.');
     }
 }
+
 
 // ==================== 유틸리티 함수 ====================
 
