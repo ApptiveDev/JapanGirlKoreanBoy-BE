@@ -327,6 +327,25 @@ async function confirmStatusChange() {
 // ==================== 유저 매칭 탭 ====================
 
 /**
+ * Use Case 3: 승인완료 상태 여성 유저 목록 조회
+ */
+async function loadConnectingFemaleMembers() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/connecting/females`);
+        if (!response.ok) {
+            throw new Error('승인완료 여성 유저 목록 조회 실패');
+        }
+        
+        const members = await response.json();
+        renderFemaleTable(members);
+        updateTotalCount(members.length);
+    } catch (error) {
+        console.error('승인완료 여성 유저 목록 조회 오류:', error);
+        showError('승인완료 여성 유저 목록을 불러오는데 실패했습니다.');
+    }
+}
+
+/**
  * 승인완료 여성 유저 테이블 렌더링
  */
 function renderFemaleTable(members) {
