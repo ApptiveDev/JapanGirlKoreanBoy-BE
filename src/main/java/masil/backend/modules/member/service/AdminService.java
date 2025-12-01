@@ -7,6 +7,7 @@ import masil.backend.modules.member.dto.request.CreateMatchingRequest;
 import masil.backend.modules.member.dto.response.AdminMemberDetailResponse;
 import masil.backend.modules.member.dto.response.AdminMemberListResponse;
 import masil.backend.modules.member.dto.response.MatchingScoreResponse;
+import masil.backend.modules.member.entity.Matching;
 import masil.backend.modules.member.entity.Member;
 import masil.backend.modules.member.enums.Gender;
 import masil.backend.modules.member.enums.MemberStatus;
@@ -15,6 +16,8 @@ import masil.backend.modules.member.exception.MemberExceptionType;
 import masil.backend.modules.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import masil.backend.modules.member.dto.response.MatchedMemberListResponse;
+import masil.backend.modules.member.repository.MatchingRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +32,7 @@ public class AdminService {
     private final MemberRepository memberRepository;
     private final MemberLowService memberLowService;
     private final MatchingScoreService matchingScoreService;
-    
+    private final MatchingRepository matchingRepository;
 
     //Use Case 1: 승인 대기 상태 유저 목록 조회
 
@@ -153,7 +156,7 @@ public class AdminService {
         List<Member> maleMembers = request.maleMemberIds().stream()
                 .map(memberLowService::getValidateExistMemberById)
                 .peek(member -> {
-                    if (member.getStatus() != MemberStatus.CONNECTING) {
+                    if (member.getStatus() != MemberStatus.APPROVED) {
                         throw new IllegalArgumentException(
                                 String.format("선택한 유저 중 매칭 불가 상태가 있습니다. (memberId: %d, 상태: %s)", 
                                         member.getId(), member.getStatus()));
@@ -179,10 +182,31 @@ public class AdminService {
         femaleMember.changeToConnecting();
         maleMembers.forEach(Member::changeToConnecting);
         
+        // 매칭 테이블에 기록 생성
+        for (int i = 0; i < maleMembers.size(); i++) {
+            Matching matching = Matching.builder()
+                    .femaleMember(femaleMember)
+                    .maleMember(maleMembers.get(i))
+                    .matchingOrder(i + 1)
+                    .build();
+            matchingRepository.save(matching);
+        }
+
         log.info("매칭 생성 완료: 여성 memberId={}, 남성 memberIds={}", 
                 request.femaleMemberId(), 
                 request.maleMemberIds());
+    }
+    //Use Case 6: 생성된 매칭 목록 조회
+    @Transactional(readOnly = true)
+    public List<MatchedMemberListResponse> getAllMatchings() {
+        List<Long> femaleMemberIds = matchingRepository.findDistinctFemaleMemberIds();
         
-        // TODO: 매칭 테이블에 매칭 기록 생성 (선택사항)
+        return femaleMemberIds.stream()
+                .map(femaleId -> {
+                    List<Matching> matchings = matchingRepository.findByFemaleMemberIdOrderByMatchingOrder(femaleId);
+                    return MatchedMemberListResponse.from(matchings);
+                })
+                .filter(response -> response != null)
+                .collect(Collectors.toList());
     }
 }

@@ -11,6 +11,7 @@ import masil.backend.modules.member.dto.response.MatchingScoreResponse;
 import masil.backend.modules.member.service.AdminService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import masil.backend.modules.member.dto.response.MatchedMemberListResponse;
 
 import java.util.List;
 
@@ -73,5 +74,12 @@ public class MemerAdminController {
                 request.femaleMemberId(), request.maleMemberIds());
         adminService.createMatching(request);
         return ResponseEntity.ok().build();
+    }
+    
+    @GetMapping("/matchings")
+    public ResponseEntity<List<MatchedMemberListResponse>> getAllMatchings() {
+        log.info("매칭 목록 조회 요청");
+        List<MatchedMemberListResponse> matchings = adminService.getAllMatchings();
+        return ResponseEntity.ok(matchings);
     }
 }

@@ -22,6 +22,10 @@
                 <span class="tab-icon">💕</span>
                 <span class="tab-text">유저 매칭</span>
             </button>
+            <button class="nav-tab" data-tab="matching-list">
+                <span class="tab-icon">📋</span>
+                <span class="tab-text">매칭 목록</span>
+            </button>
         </nav>
     </aside>
 
@@ -147,6 +151,37 @@
                 </div>
             </section>
         </div>
+
+        <!-- 매칭 확인 탭 콘텐츠 -->
+        <div id="matching-list-tab-content" class="tab-content">
+            <section class="table-section">
+                <h2 style="margin-bottom: 20px; color: #2d3748;">생성된 매칭 목록</h2>
+                <div class="table-wrapper">
+                    <table class="member-table">
+                        <thead>
+                        <tr>
+                            <th>매칭 ID</th>
+                            <th>여성 유저</th>
+                            <th>남성 유저 1</th>
+                            <th>남성 유저 2</th>
+                            <th>남성 유저 3</th>
+                            <th>생성일</th>
+                        </tr>
+                        </thead>
+                        <tbody id="matching-list-table-body">
+                        <tr class="empty-row">
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <p>조회된 매칭이 없습니다.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>  
+
     </main>
 </div>
 

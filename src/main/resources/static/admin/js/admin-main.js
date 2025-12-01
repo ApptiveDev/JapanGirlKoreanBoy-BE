@@ -113,16 +113,23 @@ function switchTab(tabType) {
     // 콘텐츠 표시/숨김
     document.getElementById('approval-tab-content').classList.toggle('active', tabType === 'approval');
     document.getElementById('matching-tab-content').classList.toggle('active', tabType === 'matching');
+    document.getElementById('matching-list-tab-content').classList.toggle('active', tabType === 'matching-list');
 
     // 타이틀 변경
-    const title = tabType === 'approval' ? '유저 승인' : '유저 매칭';
-    document.getElementById('current-tab-title').textContent = title;
+    const titleMap = {
+        'approval': '유저 승인',
+        'matching': '유저 매칭',
+        'matching-list': '매칭 확인'
+    };
+    document.getElementById('current-tab-title').textContent = titleMap[tabType] || '유저 승인';
 
     // 데이터 로드
     if (tabType === 'approval') {
         loadApprovalMembers();
-    } else {
+    } else if (tabType === 'matching') {
         loadConnectingFemaleMembers();
+    } else if (tabType === 'matching-list') {
+        loadMatchingList();
     }
 }
 
@@ -560,9 +567,70 @@ async function createMatching() {
         hideLoading();
         showError(error.message || '매칭 생성에 실패했습니다.');
     }
+    
 }
 
 
+// Use Case 6: 매칭 목록 조회
+async function loadMatchingList() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/matchings`);
+        if (!response.ok) {
+            throw new Error('매칭 목록 조회 실패');
+        }
+        
+        const matchings = await response.json();
+        renderMatchingListTable(matchings);
+        updateTotalCount(matchings.length);
+    } catch (error) {
+        console.error('매칭 목록 조회 오류:', error);
+        showError('매칭 목록을 불러오는데 실패했습니다.');
+    }
+}
+//매칭 목록 렌더링
+function renderMatchingListTable(matchings) {
+    const tbody = document.getElementById('matching-list-table-body');
+    
+    if (matchings.length === 0) {
+        tbody.innerHTML = `
+            <tr class="empty-row">
+                <td colspan="6">
+                    <div class="empty-state">
+                        <p>조회된 매칭이 없습니다.</p>
+                    </div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = matchings.map(matching => `
+        <tr>
+            <td>${matching.matchingId}</td>
+            <td>
+                <a href="#" class="member-name-link" onclick="openMemberDetail(${matching.femaleMemberId}); return false;">
+                    ${matching.femaleName}
+                </a>
+                <br>
+                <small style="color: #718096;">${matching.femaleEmail}</small>
+            </td>
+            <td>
+                ${matching.maleMembers.map((male, index) => `
+                    <div style="margin-bottom: 8px;">
+                        <a href="#" class="member-name-link" onclick="openMemberDetail(${male.memberId}); return false;">
+                            ${male.name}
+                        </a>
+                        <br>
+                        <small style="color: #718096;">${male.email}</small>
+                        <br>
+                        <small style="color: #a0aec0;">순서: ${male.order}</small>
+                    </div>
+                `).join('')}
+            </td>
+            <td>${formatDate(matching.createdAt)}</td>
+        </tr>
+    `).join('');
+}
 // ==================== 유틸리티 함수 ====================
 
 function getStatusClass(status) {
