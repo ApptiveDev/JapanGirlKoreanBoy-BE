@@ -1,7 +1,6 @@
 package masil.backend.modules.member.service;
 
 import static masil.backend.modules.member.exception.MemberExceptionType.CANNOT_MATCH_PASSWORD;
-import static masil.backend.modules.member.exception.MemberExceptionType.MEMBER_RELIGION_OTHER_FAILED;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +10,6 @@ import masil.backend.modules.member.dto.request.SignUpRequest;
 import masil.backend.modules.member.dto.response.MyInfoResponse;
 import masil.backend.modules.member.dto.response.SignInResponse;
 import masil.backend.modules.member.entity.Member;
-import masil.backend.modules.member.enums.Religion;
 import masil.backend.modules.member.exception.MemberException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,36 +25,18 @@ public class MemberHighService {
     private final PasswordEncoder passwordEncoder;
 
     public void signUp(final SignUpRequest signUpRequest) {
-        validateReligionOther(signUpRequest.religion(), signUpRequest.religionOther());
-
         final String encodedPassword = passwordEncoder.encode(signUpRequest.password());
 
         memberLowService.checkIsDuplicateEmail(signUpRequest.email());
 
-        memberLowService.saveLocalMember(
-                signUpRequest.name(),
-                signUpRequest.email(),
-                encodedPassword,
-                signUpRequest.gender(),
-                signUpRequest.height(),
-                signUpRequest.weight(),
-                signUpRequest.residenceArea(),
-                signUpRequest.smokingStatus(),
-                signUpRequest.drinkingFrequency(),
-                signUpRequest.religion(),
-                signUpRequest.religionOther(),
-                signUpRequest.education(),
-                signUpRequest.asset(),
-                signUpRequest.otherInfo(),
-                signUpRequest.profileImageUrl()
-        );
+        memberLowService.saveLocalMember(signUpRequest.name(), signUpRequest.email(), encodedPassword);
     }
 
     public SignInResponse signIn(final SignInRequest signInRequest) {
         final Member member =  memberLowService.getValidateExistMemberByEmail(signInRequest.email());
         checkCorrectPassword(member.getPassword(), signInRequest.password());
         final String token = getToken(member.getId(), member.getName());
-        return new SignInResponse(member, token);
+        return new SignInResponse(member, token, member.getStatus());
     }
 
     @Transactional(readOnly = true)
@@ -73,11 +53,5 @@ public class MemberHighService {
 
     private String getToken(final Long memberId, final String name) {
         return jwtProvider.createToken(String.valueOf(memberId), name);
-    }
-
-    private void validateReligionOther(final Religion religion, final String religionOther) {
-        if (religion == Religion.OTHER && (religionOther == null || religionOther.isBlank())) {
-            throw new MemberException(MEMBER_RELIGION_OTHER_FAILED);
-        }
     }
 }

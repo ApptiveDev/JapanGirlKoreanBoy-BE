@@ -20,12 +20,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberPreferenceHighService {
     private final MemberPreferenceLowService memberPreferenceLowService;
     private final MemberLowService memberLowService;
+    private final MemberAiService memberAiService;
 
     public void saveMemberPreference(
             final Long memberId,
             final SaveMemberPreferenceRequest request
     ) {
         final Member member = memberLowService.getValidateExistMemberById(memberId);
+
+        memberLowService.updateMemberProfile(
+                member,
+                request.gender(), request.height(), request.weight(),
+                request.residenceArea(), request.smokingStatus(), request.drinkingFrequency(),
+                request.religion(), request.education(), request.asset(),
+                request.otherInfo(), request.thumbnailImageUrl()
+        );
 
         validatePriorityDuplication(request.priority1(), request.priority2(), request.priority3());
 
@@ -35,24 +44,15 @@ public class MemberPreferenceHighService {
 
         memberPreferenceLowService.saveMemberPreference(
                 member,
-                request.preferredHeightMin(),
-                request.preferredHeightMax(),
-                avoidReligionsBitmask,
-                request.preferredEducationLevel(),
-                request.preferredAppearanceStyle(),
-                request.parentAssetRequirement(),
-                request.preferredAssetMin(),
-                request.preferredAssetMax(),
-                preferredJobsJson,
-                avoidedJobsJson,
-                request.mbti1(),
-                request.mbti2(),
-                request.mbti3(),
-                request.mbti4(),
-                request.priority1(),
-                request.priority2(),
-                request.priority3()
+                request.preferredHeightMin(), request.preferredHeightMax(),
+                avoidReligionsBitmask, request.preferredEducationLevel(), request.preferredAppearanceStyle(),
+                request.parentAssetRequirement(), request.preferredAssetMin(), request.preferredAssetMax(),
+                preferredJobsJson, avoidedJobsJson,
+                request.mbti1(), request.mbti2(), request.mbti3(), request.mbti4(),
+                request.priority1(), request.priority2(), request.priority3()
         );
+
+        memberAiService.generateMemberSummary(memberId, request.otherInfo());
     }
 
     @Transactional(readOnly = true)

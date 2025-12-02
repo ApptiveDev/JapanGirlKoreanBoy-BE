@@ -33,20 +33,10 @@ public class MemberLowService {
     }
 
     @Transactional
-    public void saveLocalMember(
-            final String name, final String email, final String password,
-            final Gender gender, final Integer height, final Integer weight,
-            final String residenceArea, final SmokingStatus smokingStatus, final DrinkingFrequency drinkingFrequency,
-            final Religion religion, final String religionOther, final Education education,
-            final Asset asset, final String otherInfo, final String profileImageUrl
-    ) {
+    public void saveLocalMember(final String name, final String email, final String password) {
         final Member member = Member.builder()
-                .name(name).email(email).password(password)
-                .provider(Provider.LOCAL).gender(gender).height(height)
-                .weight(weight).residenceArea(residenceArea).smokingStatus(smokingStatus)
-                .drinkingFrequency(drinkingFrequency).religion(religion).religionOther(religionOther)
-                .education(education).asset(asset).otherInfo(otherInfo).profileImageUrl(profileImageUrl)
-                .build();
+                                    .name(name).email(email).password(password)
+                                    .build();
 
         memberRepository.save(member);
     }
@@ -80,7 +70,6 @@ public class MemberLowService {
                .smokingStatus(profileRequest.smokingStatus())
                .drinkingFrequency(profileRequest.drinkingFrequency())
                .religion(profileRequest.religion())
-               .religionOther(profileRequest.religionOther())
                .education(profileRequest.education())
                .asset(profileRequest.asset())
                .otherInfo(profileRequest.otherInfo())
@@ -100,5 +89,27 @@ public class MemberLowService {
 
     public Member findByEmailAndProvider(String email, Provider provider) {
         return memberRepository.findByEmailAndProvider(email, provider).orElse(null);
+    }
+
+    @Transactional
+    public void updateMemberProfile(
+            final Member member,
+            final Gender gender,
+            final Integer height,
+            final Integer weight,
+            final String residenceArea,
+            final SmokingStatus smokingStatus,
+            final DrinkingFrequency drinkingFrequency,
+            final Religion religion,
+            final Education education,
+            final Asset asset,
+            final String otherInfo,
+            final String profileImageUrl
+    ) {
+        member.updateProfile(
+                gender, height, weight, residenceArea,
+                smokingStatus, drinkingFrequency, religion,
+                education, asset, otherInfo, profileImageUrl
+        );
     }
 }
