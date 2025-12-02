@@ -54,7 +54,6 @@ public class MatchingController {
     
 
     //남성이 매칭 수락
-
     @PostMapping("/{matchingId}/accept")
     public ResponseEntity<Void> acceptMatchingByMale(
             @LoginMember MemberDetails memberDetails,

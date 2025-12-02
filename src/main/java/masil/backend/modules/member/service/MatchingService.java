@@ -59,9 +59,25 @@ public class MatchingService {
             throw new IllegalArgumentException("선택 대기 중인 매칭만 선택할 수 있습니다.");
         }
         
+        // 같은 여성의 다른 매칭들을 먼저 조회 (선택 전에 조회해야 함)
+        List<Matching> otherMatchings = matchingRepository.findByFemaleMemberIdAndStatusOrderByMatchingOrder(
+                femaleMemberId,
+                MatchingStatus.PENDING_FEMALE_SELECTION
+        );
+        
         // 선택된 매칭을 수락 대기 상태로 변경
         selectedMatching.selectByFemale();
         
+        // 같은 여성의 다른 매칭들을 거절 상태로 변경
+        otherMatchings.forEach(matching -> {
+            if (!matching.getId().equals(matchingId)) {
+                matching.reject();
+            }
+        });
+        
+        log.info("여성이 남성 선택: femaleMemberId={}, matchingId={}, selectedMaleId={}, 거절된 매칭 수={}", 
+                femaleMemberId, matchingId, selectedMatching.getMaleMember().getId(), 
+                otherMatchings.size() - 1);
     }
     
     //남성에게 매칭 알림 조회 (수락 대기 중인 매칭)
@@ -108,11 +124,25 @@ public class MatchingService {
             throw new IllegalArgumentException("수락 대기 중인 매칭만 수락할 수 있습니다.");
         }
         
+        // 같은 남성의 다른 매칭들을 먼저 조회 (수락 전에 조회해야 함)
+        List<Matching> otherMatchings = matchingRepository.findByMaleMemberIdAndStatus(
+                maleMemberId,
+                MatchingStatus.PENDING_MALE_ACCEPTANCE
+        );
+        
         // 매칭 수락
         matching.acceptByMale();
         
-        log.info("남성이 매칭 수락: maleMemberId={}, matchingId={}, femaleMemberId={}", 
-                maleMemberId, matchingId, matching.getFemaleMember().getId());
+        // 같은 남성의 다른 매칭들을 거절 상태로 변경
+        otherMatchings.forEach(otherMatching -> {
+            if (!otherMatching.getId().equals(matchingId)) {
+                otherMatching.reject();
+            }
+        });
+        
+        log.info("남성이 매칭 수락: maleMemberId={}, matchingId={}, femaleMemberId={}, 거절된 매칭 수={}", 
+                maleMemberId, matchingId, matching.getFemaleMember().getId(), 
+                otherMatchings.size() - 1);
     }
     
     //남성이 매칭 거절
