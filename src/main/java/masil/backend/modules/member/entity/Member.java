@@ -1,5 +1,6 @@
 package masil.backend.modules.member.entity;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -173,5 +174,17 @@ public class Member extends BaseEntity {
         return gender != null && height != null && weight != null
                 && residenceArea != null && smokingStatus != null
                 && drinkingFrequency != null && religion != null;
+    }
+
+    public void changeToConnecting() {
+        this.status = MemberStatus.CONNECTING;
+    }
+
+    public void changeToConnected() {
+        this.status = MemberStatus.CONNECTED;
+    }
+
+    public void changeStatus(MemberStatus newStatus) {
+        this.status = newStatus;
     }
 }
