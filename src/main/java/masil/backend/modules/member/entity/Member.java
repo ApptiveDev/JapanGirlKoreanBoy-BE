@@ -94,6 +94,9 @@ public class Member extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String aiSummary;
 
+    @Column(length = 500)
+    private String fcmToken;
+
     @Builder
     private Member(
             final Long id, final Provider provider, final String providerId,
@@ -186,5 +189,9 @@ public class Member extends BaseEntity {
 
     public void changeStatus(MemberStatus newStatus) {
         this.status = newStatus;
+    }
+
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 }
