@@ -8,6 +8,7 @@ import masil.backend.modules.member.dto.request.SaveMemberPreferenceRequest;
 import masil.backend.modules.member.dto.response.MemberPreferenceResponse;
 import masil.backend.modules.member.entity.Member;
 import masil.backend.modules.member.entity.MemberPreference;
+import masil.backend.modules.member.enums.MemberStatus;
 import masil.backend.modules.member.enums.PreferenceCategory;
 import masil.backend.modules.member.enums.Religion;
 import masil.backend.modules.member.exception.MemberException;
@@ -51,6 +52,8 @@ public class MemberPreferenceHighService {
                 request.mbti1(), request.mbti2(), request.mbti3(), request.mbti4(),
                 request.priority1(), request.priority2(), request.priority3()
         );
+
+        member.changeStatus(MemberStatus.PENDING_APPROVAL);
 
         memberAiService.generateMemberSummary(memberId, request.otherInfo());
     }

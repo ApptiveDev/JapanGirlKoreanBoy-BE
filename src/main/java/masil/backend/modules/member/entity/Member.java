@@ -106,7 +106,7 @@ public class Member extends BaseEntity {
         this.provider = provider != null ? provider : Provider.LOCAL;
         this.providerId = providerId;
         this.isDeleted = false;
-        this.status = MemberStatus.PENDING_APPROVAL;
+        this.status = MemberStatus.INCOMPLETE_PROFILE;
         this.name = name;
         this.email = email;
         this.password = password;
