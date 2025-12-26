@@ -97,19 +97,19 @@ public record SaveMemberPreferenceRequest(
         List<JobType> avoidedJobs,
 
         @NotNull(message = "MBTI E/I를 선택해주세요.")
-        @Pattern(regexp = "^[EI]$", message = "MBTI E/I는 E, I 중 하나여야 합니다.")
+        @Pattern(regexp = "^[EIX]$", message = "MBTI E/I는 E, I, X 중 하나여야 합니다.")
         String mbti1,
 
         @NotNull(message = "MBTI N/S를 선택해주세요.")
-        @Pattern(regexp = "^[NS]$", message = "MBTI N/S는 N, S 중 하나여야 합니다.")
+        @Pattern(regexp = "^[NSX]$", message = "MBTI N/S는 N, S, X 중 하나여야 합니다.")
         String mbti2,
 
         @NotNull(message = "MBTI T/F를 선택해주세요.")
-        @Pattern(regexp = "^[TF]$", message = "MBTI T/F는 T, F 중 하나여야 합니다.")
+        @Pattern(regexp = "^[TFX]$", message = "MBTI T/F는 T, F, X 중 하나여야 합니다.")
         String mbti3,
 
         @NotNull(message = "MBTI J/P를 선택해주세요.")
-        @Pattern(regexp = "^[JP]$", message = "MBTI J/P는 J, P 중 하나여야 합니다.")
+        @Pattern(regexp = "^[JPX]$", message = "MBTI J/P는 J, P, X 중 하나여야 합니다.")
         String mbti4,
 
         @NotNull(message = "1순위를 선택해주세요.")

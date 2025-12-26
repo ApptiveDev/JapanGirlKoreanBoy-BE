@@ -29,6 +29,7 @@ public enum JobType {
     FREELANCER("프리랜서"),
     STUDENT("학생"),
     UNEMPLOYED("무직"),
+    ANY("상관없음"),
     OTHER("기타");
 
     private final String description;
