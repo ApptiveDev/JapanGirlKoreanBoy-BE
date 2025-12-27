@@ -94,6 +94,9 @@ public class Member extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String aiSummary;
 
+    @Column(length = 500)
+    private String fcmToken;
+
     @Builder
     private Member(
             final Long id, final Provider provider, final String providerId,
@@ -154,22 +157,6 @@ public class Member extends BaseEntity {
         this.aiSummary = aiSummary;
     }
 
-    public void updatePassword(final String newPassword) {
-        this.password = newPassword;
-    }
-
-    public boolean isPasswordEqual(final String newPassword) {
-        return this.password != null && this.password.equals(newPassword);
-    }
-
-    public void approve() {
-        this.status = MemberStatus.APPROVED;
-    }
-
-    public void blacklist() {
-        this.status = MemberStatus.BLACKLISTED;
-    }
-
     public boolean isProfileComplete() {
         return gender != null && height != null && weight != null
                 && residenceArea != null && smokingStatus != null
@@ -180,11 +167,11 @@ public class Member extends BaseEntity {
         this.status = MemberStatus.CONNECTING;
     }
 
-    public void changeToConnected() {
-        this.status = MemberStatus.CONNECTED;
-    }
-
     public void changeStatus(MemberStatus newStatus) {
         this.status = newStatus;
+    }
+
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 }

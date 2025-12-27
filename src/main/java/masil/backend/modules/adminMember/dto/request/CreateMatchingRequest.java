@@ -1,4 +1,4 @@
-package masil.backend.modules.member.dto.request;
+package masil.backend.modules.adminMember.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

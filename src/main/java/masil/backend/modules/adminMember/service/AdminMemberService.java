@@ -1,19 +1,20 @@
-package masil.backend.modules.member.service;
+package masil.backend.modules.adminMember.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import masil.backend.modules.member.dto.request.ChangeMemberStatusRequest;
-import masil.backend.modules.member.dto.request.CreateMatchingRequest;
-import masil.backend.modules.member.dto.response.AdminMemberDetailResponse;
-import masil.backend.modules.member.dto.response.AdminMemberListResponse;
+import masil.backend.modules.adminMember.dto.request.ChangeMemberStatusRequest;
+import masil.backend.modules.adminMember.dto.request.CreateMatchingRequest;
+import masil.backend.modules.adminMember.dto.response.AdminMemberDetailResponse;
+import masil.backend.modules.adminMember.dto.response.AdminMemberListResponse;
 import masil.backend.modules.member.dto.response.MatchingScoreResponse;
 import masil.backend.modules.member.entity.Matching;
 import masil.backend.modules.member.entity.Member;
 import masil.backend.modules.member.enums.Gender;
 import masil.backend.modules.member.enums.MemberStatus;
-import masil.backend.modules.member.exception.MemberException;
-import masil.backend.modules.member.exception.MemberExceptionType;
 import masil.backend.modules.member.repository.MemberRepository;
+import masil.backend.modules.member.service.FcmService;
+import masil.backend.modules.member.service.MatchingScoreService;
+import masil.backend.modules.member.service.MemberLowService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import masil.backend.modules.member.dto.response.MatchedMemberListResponse;
@@ -27,12 +28,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class AdminService {
+public class AdminMemberService {
     
     private final MemberRepository memberRepository;
     private final MemberLowService memberLowService;
     private final MatchingScoreService matchingScoreService;
     private final MatchingRepository matchingRepository;
+    private final FcmService fcmService;
 
     //Use Case 1: 승인 대기 상태 유저 목록 조회
 
@@ -81,8 +83,12 @@ public class AdminService {
         }
         
         member.changeStatus(request.status());
+
+        // 푸시 알림 전송
+        String title = "회원 상태 변경 알림";
+        String body = getStatusChangeMessage(request.status());
+        fcmService.sendPushNotification(member.getFcmToken(), title, body);
     }
-    
 
     //Use Case 3: 승인완료료 상태 여성 유저 목록 조회
 
@@ -208,5 +214,16 @@ public class AdminService {
                 })
                 .filter(response -> response != null)
                 .collect(Collectors.toList());
+    }
+
+    private String getStatusChangeMessage(MemberStatus status) {
+        return switch (status) {
+            case INCOMPLETE_PROFILE -> "프로필을 완성해주세요.";
+            case PENDING_APPROVAL -> "회원님의 프로필이 검토 중입니다.";
+            case APPROVED -> "회원님의 가입이 승인되었습니다! 🎉";
+            case CONNECTING -> "매칭이 진행 중입니다.";
+            case CONNECTED -> "매칭이 완료되었습니다! 축하드립니다! 🎊";
+            case BLACKLISTED -> "회원님의 계정이 제한되었습니다.";
+        };
     }
 }

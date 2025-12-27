@@ -1,4 +1,4 @@
-package masil.backend.modules.member.dto.response;
+package masil.backend.modules.adminMember.dto.response;
 
 import masil.backend.modules.member.entity.Member;
 import masil.backend.modules.member.enums.MemberStatus;

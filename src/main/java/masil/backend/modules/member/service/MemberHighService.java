@@ -3,7 +3,6 @@ package masil.backend.modules.member.service;
 import static masil.backend.modules.member.exception.MemberExceptionType.CANNOT_MATCH_PASSWORD;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import masil.backend.global.security.provider.JwtProvider;
 import masil.backend.modules.member.dto.request.SignInRequest;
 import masil.backend.modules.member.dto.request.SignUpRequest;
@@ -15,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -33,8 +31,11 @@ public class MemberHighService {
     }
 
     public SignInResponse signIn(final SignInRequest signInRequest) {
-        final Member member =  memberLowService.getValidateExistMemberByEmail(signInRequest.email());
+        final Member member = memberLowService.getValidateExistMemberByEmail(signInRequest.email());
         checkCorrectPassword(member.getPassword(), signInRequest.password());
+
+        member.updateFcmToken(signInRequest.fcmToken());
+
         final String token = getToken(member.getId(), member.getName());
         return new SignInResponse(member, token, member.getStatus());
     }

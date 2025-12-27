@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import masil.backend.modules.member.dto.response.OAuth2SignInResponse;
@@ -14,9 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import masil.backend.modules.member.dto.OAuth2TempUserInfo;
-
-import lombok.Builder;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -34,7 +30,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final OAuth2Service oAuth2Service;
     private final ObjectMapper objectMapper;
-    private static final String OAUTH2_TEMP_USER_INFO = "OAUTH2_TEMP_USER_INFO";
 
 
     @Override
@@ -63,11 +58,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         // OAuth2 로그인 처리 (기존 회원 확인, 신규 가입 등)
         OAuth2SignInResponse signInResponse = oAuth2Service.processOAuth2SignIn(userInfo);
 
-        // 신규 회원이고 프로필 완성이 필요한 경우 세션에 임시 저장
+        // 신규 회원인 경우 기본 정보로 회원이 이미 생성되었으므로 세션 저장 불필요
         if (signInResponse.needsProfileCompletion()) {
-            HttpSession session = request.getSession();
-            session.setAttribute(OAUTH2_TEMP_USER_INFO, OAuth2TempUserInfo.from(userInfo));
-            log.info("OAuth2 신규 회원 - 프로필 완성 필요. 임시 정보 세션 저장 완료.");
+            log.info("OAuth2 신규 회원 - 프로필 완성 필요. memberId: {}", signInResponse.memberId());
         }
         
         // 커스텀 URL 스킴으로 리다이렉트 (모바일 앱으로 이동)
