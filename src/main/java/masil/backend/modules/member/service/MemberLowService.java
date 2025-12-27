@@ -48,6 +48,7 @@ public class MemberLowService {
                 .email(userInfo.email())
                 .provider(Provider.GOOGLE)
                 .providerId(userInfo.providerId())
+                .profileImageUrl(userInfo.profileImageUrl())
                 .build();
 
         return memberRepository.save(member);
@@ -110,6 +111,26 @@ public class MemberLowService {
                 gender, height, weight, residenceArea,
                 smokingStatus, drinkingFrequency, religion,
                 education, asset, otherInfo, profileImageUrl
+        );
+    }
+
+    @Transactional
+    public void updateOAuth2MemberProfile(
+            final Member member,
+            final CompleteOAuth2ProfileRequest request
+    ) {
+        member.updateProfile(
+                request.gender(),
+                request.height(),
+                request.weight(),
+                request.residenceArea(),
+                request.smokingStatus(),
+                request.drinkingFrequency(),
+                request.religion(),
+                request.education(),
+                request.asset(),
+                request.otherInfo(),
+                member.getProfileImageUrl() // 기존 프로필 이미지 유지
         );
     }
 }
