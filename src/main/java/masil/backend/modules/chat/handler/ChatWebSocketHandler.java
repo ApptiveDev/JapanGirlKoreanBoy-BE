@@ -9,8 +9,6 @@ import masil.backend.modules.chat.dto.response.ChatMessageResponse;
 import masil.backend.modules.chat.entity.ChatMessage;
 import masil.backend.modules.chat.entity.ChatRoom;
 import masil.backend.modules.chat.service.ChatHighService;
-import masil.backend.modules.member.entity.Member;
-import masil.backend.modules.member.repository.MemberRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -27,7 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatWebSocketHandler extends TextWebSocketHandler {
     
     private final ChatHighService chatHighService;
-    private final MemberRepository memberRepository;
     private final ObjectMapper objectMapper;
     
     // 세션 관리: memberId -> WebSocketSession
@@ -180,23 +177,19 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
     
     private Long getMemberIdFromSession(WebSocketSession session) {
-        // WebSocket 연결 시 쿼리 파라미터나 헤더에서 memberId를 받아올 수 있음
-        // 예: ws://localhost:8080/ws/chat?memberId=123
-        String memberIdParam = session.getUri().getQuery();
-        if (memberIdParam != null && memberIdParam.startsWith("memberId=")) {
-            try {
-                return Long.parseLong(memberIdParam.substring("memberId=".length()));
-            } catch (NumberFormatException e) {
-                log.warn("잘못된 memberId 형식: {}", memberIdParam);
-            }
+        // WebSocketHandshakeInterceptor에서 설정한 memberId 가져오기
+        Object memberIdObj = session.getAttributes().get("memberId");
+        if (memberIdObj instanceof Long) {
+            return (Long) memberIdObj;
         }
         
-        // 또는 세션 속성에서 가져오기 (인증 정보가 있다면)
-        Object principal = session.getAttributes().get("principal");
-        if (principal instanceof MemberDetails) {
-            return ((MemberDetails) principal).memberId();
+        // MemberDetails에서 가져오기
+        Object memberDetailsObj = session.getAttributes().get("memberDetails");
+        if (memberDetailsObj instanceof MemberDetails) {
+            return ((MemberDetails) memberDetailsObj).memberId();
         }
         
+        log.warn("WebSocket 세션에서 memberId를 찾을 수 없음: sessionId={}", session.getId());
         return null;
     }
 }
