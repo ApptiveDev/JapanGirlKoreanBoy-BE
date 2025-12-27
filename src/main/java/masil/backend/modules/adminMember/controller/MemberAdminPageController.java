@@ -1,4 +1,4 @@
-package masil.backend.modules.member.controller;
+package masil.backend.modules.adminMember.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

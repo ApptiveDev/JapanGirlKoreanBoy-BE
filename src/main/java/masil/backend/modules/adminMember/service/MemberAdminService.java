@@ -1,17 +1,20 @@
-package masil.backend.modules.member.service;
+package masil.backend.modules.adminMember.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import masil.backend.modules.member.dto.request.ChangeMemberStatusRequest;
-import masil.backend.modules.member.dto.request.CreateMatchingRequest;
-import masil.backend.modules.member.dto.response.AdminMemberDetailResponse;
-import masil.backend.modules.member.dto.response.AdminMemberListResponse;
+import masil.backend.modules.adminMember.dto.request.ChangeMemberStatusRequest;
+import masil.backend.modules.adminMember.dto.request.CreateMatchingRequest;
+import masil.backend.modules.adminMember.dto.response.AdminMemberDetailResponse;
+import masil.backend.modules.adminMember.dto.response.AdminMemberListResponse;
 import masil.backend.modules.member.dto.response.MatchingScoreResponse;
 import masil.backend.modules.member.entity.Matching;
 import masil.backend.modules.member.entity.Member;
 import masil.backend.modules.member.enums.Gender;
 import masil.backend.modules.member.enums.MemberStatus;
 import masil.backend.modules.member.repository.MemberRepository;
+import masil.backend.modules.member.service.FcmService;
+import masil.backend.modules.member.service.MatchingScoreService;
+import masil.backend.modules.member.service.MemberLowService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import masil.backend.modules.member.dto.response.MatchedMemberListResponse;

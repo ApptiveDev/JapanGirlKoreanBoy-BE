@@ -1,14 +1,14 @@
-package masil.backend.modules.member.controller;
+package masil.backend.modules.adminMember.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import masil.backend.modules.member.dto.request.ChangeMemberStatusRequest;
-import masil.backend.modules.member.dto.request.CreateMatchingRequest;
-import masil.backend.modules.member.dto.response.AdminMemberDetailResponse;
-import masil.backend.modules.member.dto.response.AdminMemberListResponse;
+import masil.backend.modules.adminMember.dto.request.ChangeMemberStatusRequest;
+import masil.backend.modules.adminMember.dto.request.CreateMatchingRequest;
+import masil.backend.modules.adminMember.dto.response.AdminMemberDetailResponse;
+import masil.backend.modules.adminMember.dto.response.AdminMemberListResponse;
 import masil.backend.modules.member.dto.response.MatchingScoreResponse;
-import masil.backend.modules.member.service.MemberAdminService;
+import masil.backend.modules.adminMember.service.MemberAdminService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import masil.backend.modules.member.dto.response.MatchedMemberListResponse;
