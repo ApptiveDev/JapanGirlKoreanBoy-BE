@@ -2,6 +2,7 @@ package masil.backend.modules.member.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import masil.backend.modules.chat.service.ChatHighService;
 import masil.backend.modules.member.dto.response.FemaleMatchingListResponse;
 import masil.backend.modules.member.dto.response.MaleMatchingNotificationResponse;
 import masil.backend.modules.member.entity.Matching;
@@ -22,6 +23,7 @@ public class MatchingService {
     
     private final MatchingRepository matchingRepository;
     private final MemberLowService memberLowService;
+    private final ChatHighService chatHighService;
     
     
     //여성에게 매칭된 남성 목록 조회
@@ -139,6 +141,20 @@ public class MatchingService {
                 otherMatching.reject();
             }
         });
+        
+        // 매칭 성사 시 채팅방 자동 생성
+        try {
+            chatHighService.createChatRoomFromMatching(
+                    matching.getFemaleMember(),
+                    matching.getMaleMember(),
+                    matching.getId()
+            );
+            log.info("매칭 성사로 채팅방 생성 완료: matchingId={}, femaleMemberId={}, maleMemberId={}", 
+                    matching.getId(), matching.getFemaleMember().getId(), matching.getMaleMember().getId());
+        } catch (Exception e) {
+            log.error("매칭 성사 시 채팅방 생성 실패: matchingId={}, error={}", matching.getId(), e.getMessage(), e);
+            // 채팅방 생성 실패해도 매칭은 성사된 것으로 처리
+        }
         
         log.info("남성이 매칭 수락: maleMemberId={}, matchingId={}, femaleMemberId={}, 거절된 매칭 수={}", 
                 maleMemberId, matchingId, matching.getFemaleMember().getId(), 

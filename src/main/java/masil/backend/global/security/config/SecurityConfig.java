@@ -79,6 +79,7 @@ public class SecurityConfig {
                                 "/image/**",
                                 "/login/**"
                         ).permitAll()
+                        .requestMatchers("/ws/**").permitAll() // WebSocket 연결 허용 (인증은 핸들러에서 처리)
                         .anyRequest().authenticated()
                 )
                 
