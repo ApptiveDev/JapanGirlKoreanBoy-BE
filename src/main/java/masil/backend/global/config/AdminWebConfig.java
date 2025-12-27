@@ -16,8 +16,8 @@ public class AdminWebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(adminPageInterceptor)
                 .addPathPatterns(
-                        "/admin/members/**",
-                        "/admin/html/admin-main.html"
+                        "/admin/html/admin-main.html",  // 관리자 메인 페이지만
+                        "/admin/members/**"              // 관리자 API
                 )
                 .order(0);
     }

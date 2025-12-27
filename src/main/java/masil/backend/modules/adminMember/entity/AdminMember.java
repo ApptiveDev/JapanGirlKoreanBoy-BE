@@ -1,4 +1,4 @@
-package masil.backend.modules.adminAuth.entity;
+package masil.backend.modules.adminMember.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

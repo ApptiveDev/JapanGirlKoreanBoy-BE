@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import masil.backend.modules.adminAuth.entity.AdminMember;
+import masil.backend.modules.adminMember.entity.AdminMember;
 import masil.backend.modules.adminMember.dto.request.AdminMemberLoginRequest;
 import masil.backend.modules.adminMember.service.AdminMemberAuthService;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,12 +24,6 @@ public class AdminMemberPageController {
 
     @Value("${admin.session.timeout:7200}")
     private int sessionTimeout;
-
-    @GetMapping("/html/admin-main.html")
-    public String adminPage(HttpSession session) {
-        // 세션 체크는 Interceptor에서 처리됨
-        return "forward:/admin/html/admin-main.html";
-    }
 
     @GetMapping
     public String adminHome(HttpSession session) {

@@ -41,6 +41,9 @@ function initializeEventListeners() {
         loadApprovalMembers();
     });
 
+    // 로그아웃
+    document.getElementById('logout-btn').addEventListener('click', handleLogout);
+
     // 모달 관련
     document.querySelectorAll('.modal-close').forEach(closeBtn => {
         closeBtn.addEventListener('click', function() {
@@ -738,4 +741,22 @@ function showLoading(message) {
 
 function hideLoading() {
     console.log('Loading finished');
+}
+
+// 로그아웃 처리
+async function handleLogout() {
+    if (!confirm('로그아웃 하시겠습니까?')) {
+        return;
+    }
+
+    try {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/admin/logout';
+        document.body.appendChild(form);
+        form.submit();
+    } catch (error) {
+        console.error('로그아웃 오류:', error);
+        showError('로그아웃 처리 중 오류가 발생했습니다.');
+    }
 }

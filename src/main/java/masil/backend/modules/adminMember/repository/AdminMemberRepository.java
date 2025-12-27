@@ -1,6 +1,6 @@
 package masil.backend.modules.adminMember.repository;
 
-import masil.backend.modules.adminAuth.entity.AdminMember;
+import masil.backend.modules.adminMember.entity.AdminMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

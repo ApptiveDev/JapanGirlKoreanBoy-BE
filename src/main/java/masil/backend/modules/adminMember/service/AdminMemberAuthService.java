@@ -2,7 +2,7 @@ package masil.backend.modules.adminMember.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import masil.backend.modules.adminAuth.entity.AdminMember;
+import masil.backend.modules.adminMember.entity.AdminMember;
 import masil.backend.modules.adminMember.dto.request.AdminMemberLoginRequest;
 import masil.backend.modules.adminMember.repository.AdminMemberRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
