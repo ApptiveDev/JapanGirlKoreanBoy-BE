@@ -36,6 +36,7 @@
             <h1 id="current-tab-title">유저 승인</h1>
             <div class="header-info">
                 <span class="total-count">전체: <strong id="total-count">0</strong>명</span>
+                <button id="logout-btn" class="btn btn-cancel" style="margin-left: 20px;">로그아웃</button>
             </div>
         </header>
 
@@ -162,15 +163,13 @@
                         <tr>
                             <th>매칭 ID</th>
                             <th>여성 유저</th>
-                            <th>남성 유저 1</th>
-                            <th>남성 유저 2</th>
-                            <th>남성 유저 3</th>
+                            <th>남성 유저</th>
                             <th>생성일</th>
                         </tr>
                         </thead>
                         <tbody id="matching-list-table-body">
                         <tr class="empty-row">
-                            <td colspan="6">
+                            <td colspan="4">
                                 <div class="empty-state">
                                     <p>조회된 매칭이 없습니다.</p>
                                 </div>

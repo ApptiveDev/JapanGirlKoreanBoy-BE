@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 로그인</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 420px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .alert {
+            background-color: #fee;
+            color: #c33;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #e74c3c;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>🔐 관리자 로그인</h2>
+
+    <div id="alertBox" class="alert"></div>
+
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="adminId">관리자 ID</label>
+            <input type="text" id="adminId" name="adminId" placeholder="관리자 ID를 입력하세요" autocomplete="username" required>
+            <div id="adminIdError" class="error-message">관리자 ID를 입력해주세요.</div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" autocomplete="current-password" required>
+            <div id="passwordError" class="error-message">비밀번호를 입력해주세요.</div>
+        </div>
+
+        <button type="submit" id="loginBtn">로그인</button>
+    </form>
+</div>
+
+<script>
+    const loginForm = document.getElementById('loginForm');
+    const adminIdInput = document.getElementById('adminId');
+    const passwordInput = document.getElementById('password');
+    const adminIdError = document.getElementById('adminIdError');
+    const passwordError = document.getElementById('passwordError');
+    const alertBox = document.getElementById('alertBox');
+    const loginBtn = document.getElementById('loginBtn');
+
+    // URL에서 에러 메시지 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorMsg = urlParams.get('error');
+    if (errorMsg) {
+        showAlert(decodeURIComponent(errorMsg));
+    }
+
+    // 로그인 폼 제출 부분만 수정
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // 에러 메시지 초기화
+        adminIdError.classList.remove('show');
+        passwordError.classList.remove('show');
+        alertBox.classList.remove('show');
+
+        const adminId = adminIdInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        // 유효성 검사
+        let hasError = false;
+
+        if (!adminId) {
+            adminIdError.classList.add('show');
+            hasError = true;
+        }
+
+        if (!password) {
+            passwordError.classList.add('show');
+            hasError = true;
+        }
+
+        if (hasError) return;
+
+        // 로그인 요청
+        try {
+            loginBtn.disabled = true;
+            loginBtn.textContent = '로그인 중...';
+
+            const formData = new URLSearchParams();
+            formData.append('adminId', adminId);
+            formData.append('password', password);
+
+            const response = await fetch('/admin/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData
+            });
+
+            const result = await response.text();
+
+            if (result === 'SUCCESS') {
+                // 로그인 성공
+                window.location.href = '/admin/html/admin-main.html';
+            } else if (result.startsWith('ERROR:')) {
+                // 에러 메시지 표시
+                const errorMessage = result.substring(6);
+                showAlert(errorMessage);
+            } else {
+                showAlert('로그인에 실패했습니다.');
+            }
+
+        } catch (error) {
+            console.error('Login error:', error);
+            showAlert('로그인 처리 중 오류가 발생했습니다.');
+        } finally {
+            loginBtn.disabled = false;
+            loginBtn.textContent = '로그인';
+        }
+    });
+
+    function showAlert(message) {
+        alertBox.textContent = message;
+        alertBox.classList.add('show');
+    }
+
+    // 입력 시 에러 메시지 제거
+    adminIdInput.addEventListener('input', () => {
+        adminIdError.classList.remove('show');
+    });
+
+    passwordInput.addEventListener('input', () => {
+        passwordError.classList.remove('show');
+    });
+</script>
+</body>
+</html>
