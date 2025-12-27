@@ -39,8 +39,12 @@ public class OAuth2Service {
         // 신규 회원인 경우: 기본 정보만으로 회원 생성
         Member newMember = memberLowService.saveOAuth2Member(userInfo);
         
-        // 프로필 미완성 상태이므로 토큰은 발급하지 않음
-        return OAuth2SignInResponse.needsProfile(newMember.getId(), userInfo);
+        // 신규 회원도 즉시 토큰 발급 (프로필 완성 필요 플래그는 true)
+        String accessToken = jwtProvider.createToken(
+                newMember.getId().toString(), 
+                newMember.getName()
+        );
+        return OAuth2SignInResponse.signedIn(newMember, accessToken, true);
     }
 
     @Transactional
