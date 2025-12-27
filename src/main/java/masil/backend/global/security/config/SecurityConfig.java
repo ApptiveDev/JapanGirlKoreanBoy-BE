@@ -75,8 +75,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/error",
-                                "/sign-up/**",
-                                "/sign-in/**",
+                                "/sign-up*/**",
+                                "/sign-in*/**",
                                 "/oauth2/**",
                                 "/oauth2/authorization/**",
                                 "/admin/**",
