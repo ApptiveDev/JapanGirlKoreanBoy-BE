@@ -34,9 +34,7 @@ public class MemberHighService {
         final Member member = memberLowService.getValidateExistMemberByEmail(signInRequest.email());
         checkCorrectPassword(member.getPassword(), signInRequest.password());
 
-        if (signInRequest.fcmToken() != null && !signInRequest.fcmToken().isBlank()) {
-            member.updateFcmToken(signInRequest.fcmToken());
-        }
+        member.updateFcmToken(signInRequest.fcmToken());
 
         final String token = getToken(member.getId(), member.getName());
         return new SignInResponse(member, token, member.getStatus());
