@@ -37,3 +37,5 @@ build/
 ### application properties ###
 application-secret.properties
 application-monitor.properties
+
+firebase-service-account.json
