@@ -8,7 +8,7 @@ import masil.backend.modules.member.dto.request.CreateMatchingRequest;
 import masil.backend.modules.member.dto.response.AdminMemberDetailResponse;
 import masil.backend.modules.member.dto.response.AdminMemberListResponse;
 import masil.backend.modules.member.dto.response.MatchingScoreResponse;
-import masil.backend.modules.member.service.AdminService;
+import masil.backend.modules.member.service.MemberAdminService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import masil.backend.modules.member.dto.response.MatchedMemberListResponse;
@@ -21,21 +21,21 @@ import java.util.List;
 @RequestMapping("/admin/members")
 public class MemerAdminController {
     
-    private final AdminService adminService;
+    private final MemberAdminService memberAdminService;
     
     @GetMapping("/pending-approval")
     public ResponseEntity<List<AdminMemberListResponse>> getPendingApprovalMembers(
             @RequestParam(required = false) String keyword
     ) {
         log.info("승인 대기 유저 목록 조회 요청: keyword={}", keyword);
-        List<AdminMemberListResponse> members = adminService.getPendingApprovalMembers(keyword);
+        List<AdminMemberListResponse> members = memberAdminService.getPendingApprovalMembers(keyword);
         return ResponseEntity.ok(members);
     }
     
     @GetMapping("/{id}")
     public ResponseEntity<AdminMemberDetailResponse> getMemberDetail(@PathVariable Long id) {
         log.info("유저 상세 정보 조회 요청: memberId={}", id);
-        AdminMemberDetailResponse response = adminService.getMemberDetail(id);
+        AdminMemberDetailResponse response = memberAdminService.getMemberDetail(id);
         return ResponseEntity.ok(response);
     }
 
@@ -45,7 +45,7 @@ public class MemerAdminController {
             @Valid @RequestBody ChangeMemberStatusRequest request
     ) {
         log.info("유저 상태 변경 요청: memberId={}, newStatus={}", id, request.status());
-        adminService.changeMemberStatus(id, request);
+        memberAdminService.changeMemberStatus(id, request);
         return ResponseEntity.ok().build();
     }
     
@@ -53,7 +53,7 @@ public class MemerAdminController {
     @GetMapping("/connecting/females")
     public ResponseEntity<List<AdminMemberListResponse>> getConnectingFemaleMembers() {
         log.info("승인완료 상태 여성 유저 목록 조회 요청");
-        List<AdminMemberListResponse> members = adminService.getConnectingFemaleMembers();
+        List<AdminMemberListResponse> members = memberAdminService.getConnectingFemaleMembers();
         return ResponseEntity.ok(members);
     }
 
@@ -62,7 +62,7 @@ public class MemerAdminController {
             @PathVariable Long femaleId
     ) {
         log.info("매칭 후보 조회 요청: femaleMemberId={}", femaleId);
-        List<MatchingScoreResponse> candidates = adminService.getMatchingCandidates(femaleId);
+        List<MatchingScoreResponse> candidates = memberAdminService.getMatchingCandidates(femaleId);
         return ResponseEntity.ok(candidates);
     }
 
@@ -72,14 +72,14 @@ public class MemerAdminController {
     ) {
         log.info("매칭 생성 요청: femaleMemberId={}, maleMemberIds={}", 
                 request.femaleMemberId(), request.maleMemberIds());
-        adminService.createMatching(request);
+        memberAdminService.createMatching(request);
         return ResponseEntity.ok().build();
     }
     
     @GetMapping("/matchings")
     public ResponseEntity<List<MatchedMemberListResponse>> getAllMatchings() {
         log.info("매칭 목록 조회 요청");
-        List<MatchedMemberListResponse> matchings = adminService.getAllMatchings();
+        List<MatchedMemberListResponse> matchings = memberAdminService.getAllMatchings();
         return ResponseEntity.ok(matchings);
     }
 }
