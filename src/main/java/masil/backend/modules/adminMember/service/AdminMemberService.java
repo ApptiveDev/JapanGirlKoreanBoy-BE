@@ -132,12 +132,21 @@ public class AdminMemberService {
         
         // 매칭 점수 계산 및 정렬
         return maleMembers.stream()
-                .map(male -> {
-                    Double score = matchingScoreService.calculateMatchingScore(femaleMember, male);
-                    return MatchingScoreResponse.from(male, score);
-                })
-                .sorted((a, b) -> Double.compare(b.matchingScore(), a.matchingScore())) // 내림차순
-                .collect(Collectors.toList());
+        .map(male -> {
+            Double score = matchingScoreService.calculateMatchingScore(femaleMember, male);
+            
+            // 해당 남성의 매칭 정보 조회
+            List<Matching> matchings = matchingRepository.findByMaleMemberId(male.getId());
+            int matchingCount = matchings.size();
+            List<String> matchingStatuses = matchings.stream()
+                    .map(matching -> matching.getStatus().name())
+                    .distinct()
+                    .toList();
+            
+            return MatchingScoreResponse.from(male, score, matchingCount, matchingStatuses);
+        })
+        .sorted((a, b) -> Double.compare(b.matchingScore(), a.matchingScore())) // 내림차순
+        .collect(Collectors.toList());
     }
     
 
