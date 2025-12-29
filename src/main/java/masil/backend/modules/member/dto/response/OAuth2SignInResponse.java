@@ -16,8 +16,8 @@ public record OAuth2SignInResponse(
 ) {
     // 로그인 완료(기존 회원 등): 토큰 포함, 프로필 완성 여부에 따라 다름
     public static OAuth2SignInResponse signedIn(
-            final Member member, 
-            final String accessToken, 
+            final Member member,
+            final String accessToken,
             final MemberStatus status
     ) {
         return new OAuth2SignInResponse(
@@ -38,8 +38,8 @@ public record OAuth2SignInResponse(
     // 신규 + 프로필 미완성: 회원은 생성되었지만 토큰 없음
     public static OAuth2SignInResponse needsProfile(final Long memberId, final OAuth2UserInfo userInfo) {
         return new OAuth2SignInResponse(
-                memberId, 
-                userInfo.name(), 
+                memberId,
+                userInfo.name(),
                 userInfo.email(),
                 null,              // 토큰 없음
                 "",

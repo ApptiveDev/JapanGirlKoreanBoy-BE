@@ -15,7 +15,7 @@ public record MatchingScoreResponse(
         Double matchingScore,
         Integer matchingCount             // 현재 매칭된 개수
 ) {
-    public static MatchingScoreResponse from(Member member, Double score, Integer matchingCount, List<String> matchingStatuses) {
+    public static MatchingScoreResponse from(Member member, Double score, Integer matchingCount) {
         return new MatchingScoreResponse(
                 member.getId(),
                 member.getName(),

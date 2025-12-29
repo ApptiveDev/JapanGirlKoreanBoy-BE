@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import masil.backend.modules.member.dto.response.MatchedMemberListResponse;
 import masil.backend.modules.member.repository.MatchingRepository;
+import masil.backend.modules.member.entity.Matching;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -138,12 +140,7 @@ public class AdminMemberService {
             // 해당 남성의 매칭 정보 조회
             List<Matching> matchings = matchingRepository.findByMaleMemberId(male.getId());
             int matchingCount = matchings.size();
-            List<String> matchingStatuses = matchings.stream()
-                    .map(matching -> matching.getStatus().name())
-                    .distinct()
-                    .toList();
-            
-            return MatchingScoreResponse.from(male, score, matchingCount, matchingStatuses);
+            return MatchingScoreResponse.from(male, score, matchingCount);
         })
         .sorted((a, b) -> Double.compare(b.matchingScore(), a.matchingScore())) // 내림차순
         .collect(Collectors.toList());
