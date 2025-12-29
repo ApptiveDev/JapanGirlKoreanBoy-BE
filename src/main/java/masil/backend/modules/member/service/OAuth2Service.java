@@ -32,8 +32,7 @@ public class OAuth2Service {
             );
             
             // 프로필 완성 여부 확인
-            boolean needsProfile = !existingMember.isProfileComplete();
-            return OAuth2SignInResponse.signedIn(existingMember, accessToken, needsProfile);
+            return OAuth2SignInResponse.signedIn(existingMember, accessToken, existingMember.getStatus());
         }
         
         // 신규 회원인 경우: 기본 정보만으로 회원 생성
@@ -44,6 +43,6 @@ public class OAuth2Service {
                 newMember.getId().toString(), 
                 newMember.getName()
         );
-        return OAuth2SignInResponse.signedIn(newMember, accessToken, true);
+        return OAuth2SignInResponse.signedIn(newMember, accessToken, newMember.getStatus());
     }
 }

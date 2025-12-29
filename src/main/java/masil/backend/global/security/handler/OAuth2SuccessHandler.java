@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import masil.backend.modules.member.dto.response.OAuth2SignInResponse;
 import masil.backend.modules.member.dto.response.OAuth2UserInfo;
+import masil.backend.modules.member.enums.MemberStatus;
 import masil.backend.modules.member.service.OAuth2Service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -59,7 +60,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         OAuth2SignInResponse signInResponse = oAuth2Service.processOAuth2SignIn(userInfo);
 
         // 신규 회원인 경우 기본 정보로 회원이 이미 생성되었으므로 세션 저장 불필요
-        if (signInResponse.needsProfileCompletion()) {
+        if (signInResponse.status() == MemberStatus.INCOMPLETE_PROFILE) {
             log.info("OAuth2 신규 회원 - 프로필 완성 필요. memberId: {}", signInResponse.memberId());
         }
         
@@ -76,7 +77,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write(objectMapper.writeValueAsString(signInResponse));
         }
-        log.info("OAuth2 로그인 응답 needsProfileCompletion={}", signInResponse.needsProfileCompletion());
+        log.info("OAuth2 로그인 응답 status={}", signInResponse.status());
     }
 
     /**
@@ -88,7 +89,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         
         // URL 파라미터로 응답 데이터 전달
         url.append("?success=true");
-        url.append("&needsProfileCompletion=").append(signInResponse.needsProfileCompletion());
+        url.append("&status=").append(URLEncoder.encode(signInResponse.status().name(), StandardCharsets.UTF_8));
         
         if (signInResponse.memberId() != null) {
             url.append("&memberId=").append(URLEncoder.encode(signInResponse.memberId().toString(), StandardCharsets.UTF_8));
