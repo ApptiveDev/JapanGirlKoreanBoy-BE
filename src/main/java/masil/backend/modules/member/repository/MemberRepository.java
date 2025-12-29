@@ -21,6 +21,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findByStatus(MemberStatus status);
     
     List<Member> findByGenderAndStatus(Gender gender, MemberStatus status);
+
+    List<Member> findByGenderAndStatusIn(Gender gender, List<MemberStatus> statuses);
     //이름 또는 이메일로로 검색
     @Query("SELECT m FROM Member m WHERE m.status = :status " +
            "AND (m.name LIKE %:keyword% OR m.email LIKE %:keyword%)")
