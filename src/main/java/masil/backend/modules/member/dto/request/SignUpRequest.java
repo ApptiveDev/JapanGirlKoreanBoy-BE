@@ -4,9 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public record SignUpRequest(
-    @NotNull(message = "이름을 입력해주세요.")
-    String name,
-
     @NotNull(message = "이메일을 입력해주세요.")
     String email,
 

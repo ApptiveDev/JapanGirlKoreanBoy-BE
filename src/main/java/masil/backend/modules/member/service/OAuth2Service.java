@@ -46,21 +46,4 @@ public class OAuth2Service {
         );
         return OAuth2SignInResponse.signedIn(newMember, accessToken, true);
     }
-
-    @Transactional
-    public OAuth2SignInResponse completeOAuth2Profile(
-            final Long memberId,
-            final CompleteOAuth2ProfileRequest request
-    ) {
-        // 기존 회원 조회
-        Member member = memberLowService.getValidateExistMemberById(memberId);
-        
-        // 프로필 정보 업데이트
-        memberLowService.updateOAuth2MemberProfile(member, request);
-        
-        // 프로필 완성 후 토큰 발급
-        String accessToken = jwtProvider.createToken(member.getId().toString(), member.getName());
-        return OAuth2SignInResponse.signedIn(member, accessToken, false);
-    }
-
 }

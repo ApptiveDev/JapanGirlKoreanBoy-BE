@@ -22,22 +22,4 @@ public class OAuth2Controller {
         log.info("구글 OAuth2 로그인 요청");
         return ResponseEntity.ok("Google OAuth2 로그인 페이지로 리다이렉트됩니다. /oauth2/authorization/google로 접근하세요.");
     }
-
-    /**
-     * OAuth2 프로필 완성 API
-     * 구글 로그인 후 필수 정보 입력하여 프로필 완성
-     */
-    @PostMapping("/complete-profile/{memberId}")
-    public ResponseEntity<OAuth2SignInResponse> completeProfile(
-            @PathVariable Long memberId,
-            @Valid @RequestBody CompleteOAuth2ProfileRequest request
-    ) {
-        log.info("OAuth2 프로필 완성 요청 - memberId: {}", memberId);
-        
-        // 프로필 완성 처리
-        OAuth2SignInResponse response = oAuth2Service.completeOAuth2Profile(memberId, request);
-        
-        log.info("OAuth2 프로필 완성 완료: memberId={}", response.memberId());
-        return ResponseEntity.ok(response);
-    }
 }

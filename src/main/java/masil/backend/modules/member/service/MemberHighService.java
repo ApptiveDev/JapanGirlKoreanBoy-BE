@@ -27,7 +27,7 @@ public class MemberHighService {
 
         memberLowService.checkIsDuplicateEmail(signUpRequest.email());
 
-        memberLowService.saveLocalMember(signUpRequest.name(), signUpRequest.email(), encodedPassword);
+        memberLowService.saveLocalMember(signUpRequest.email(), encodedPassword);
     }
 
     public SignInResponse signIn(final SignInRequest signInRequest) {

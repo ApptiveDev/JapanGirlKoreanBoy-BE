@@ -31,6 +31,7 @@ public class MemberPreferenceHighService {
 
         memberLowService.updateMemberProfile(
                 member,
+                request.name(),
                 request.gender(), request.height(), request.weight(),
                 request.residenceArea(), request.smokingStatus(), request.drinkingFrequency(),
                 request.religion(), request.education(), request.asset(),

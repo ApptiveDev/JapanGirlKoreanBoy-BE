@@ -20,6 +20,9 @@ import java.util.List;
 import masil.backend.modules.member.enums.SmokingStatus;
 
 public record SaveMemberPreferenceRequest(
+        @NotNull(message = "이름을 입력해주세요.")
+        String name,
+
         @NotNull(message = "성별을 선택해주세요.")
         Gender gender,
 

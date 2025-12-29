@@ -33,9 +33,9 @@ public class MemberLowService {
     }
 
     @Transactional
-    public void saveLocalMember(final String name, final String email, final String password) {
+    public void saveLocalMember(final String email, final String password) {
         final Member member = Member.builder()
-                                    .name(name).email(email).password(password)
+                                    .email(email).password(password)
                                     .build();
 
         memberRepository.save(member);
@@ -95,6 +95,7 @@ public class MemberLowService {
     @Transactional
     public void updateMemberProfile(
             final Member member,
+            final String name,
             final Gender gender,
             final Integer height,
             final Integer weight,
@@ -108,29 +109,9 @@ public class MemberLowService {
             final String profileImageUrl
     ) {
         member.updateProfile(
-                gender, height, weight, residenceArea,
+                name, gender, height, weight, residenceArea,
                 smokingStatus, drinkingFrequency, religion,
                 education, asset, otherInfo, profileImageUrl
-        );
-    }
-
-    @Transactional
-    public void updateOAuth2MemberProfile(
-            final Member member,
-            final CompleteOAuth2ProfileRequest request
-    ) {
-        member.updateProfile(
-                request.gender(),
-                request.height(),
-                request.weight(),
-                request.residenceArea(),
-                request.smokingStatus(),
-                request.drinkingFrequency(),
-                request.religion(),
-                request.education(),
-                request.asset(),
-                request.otherInfo(),
-                member.getProfileImageUrl() // 기존 프로필 이미지 유지
         );
     }
 }

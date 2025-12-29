@@ -44,7 +44,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private MemberStatus status;
 
-    @Column(nullable = false)
+    @Column
     private String name;
 
     @Column(nullable = false, unique = true)
@@ -128,6 +128,7 @@ public class Member extends BaseEntity {
     }
 
     public void updateProfile(
+            final String name,
             final Gender gender,
             final Integer height,
             final Integer weight,
@@ -140,6 +141,7 @@ public class Member extends BaseEntity {
             final String otherInfo,
             final String profileImageUrl
     ) {
+        this.name = name;
         this.gender = gender;
         this.height = height;
         this.weight = weight;
