@@ -6,6 +6,7 @@ import masil.backend.modules.member.dto.response.OAuth2SignInResponse;
 import masil.backend.modules.member.dto.response.OAuth2UserInfo;
 import masil.backend.modules.member.entity.Member;
 import masil.backend.modules.member.enums.Provider;
+import masil.backend.modules.member.enums.MemberStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +33,7 @@ public class OAuth2Service {
             );
             
             // 프로필 완성 여부 확인
-            boolean needsProfile = !existingMember.isProfileComplete();
-            return OAuth2SignInResponse.signedIn(existingMember, accessToken, needsProfile);
+            return OAuth2SignInResponse.signedIn(existingMember, accessToken, existingMember.getStatus());
         }
         
         // 신규 회원인 경우: 기본 정보만으로 회원 생성
@@ -44,7 +44,7 @@ public class OAuth2Service {
                 newMember.getId().toString(), 
                 newMember.getName()
         );
-        return OAuth2SignInResponse.signedIn(newMember, accessToken, true);
+        return OAuth2SignInResponse.signedIn(newMember, accessToken, newMember.getStatus());
     }
 
     @Transactional
@@ -60,7 +60,7 @@ public class OAuth2Service {
         
         // 프로필 완성 후 토큰 발급
         String accessToken = jwtProvider.createToken(member.getId().toString(), member.getName());
-        return OAuth2SignInResponse.signedIn(member, accessToken, false);
+        return OAuth2SignInResponse.signedIn(member, accessToken, member.getStatus());
     }
 
 }
