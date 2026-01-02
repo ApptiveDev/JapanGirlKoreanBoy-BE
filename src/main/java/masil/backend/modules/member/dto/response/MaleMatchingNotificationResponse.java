@@ -13,6 +13,7 @@ public record MaleMatchingNotificationResponse(
         Integer height,
         Integer weight,
         String residenceArea,
+        String aiSummary,
         MatchingStatus status,
         LocalDateTime createdAt
 ) {
@@ -25,6 +26,9 @@ public record MaleMatchingNotificationResponse(
                 matching.getFemaleMember().getHeight(),
                 matching.getFemaleMember().getWeight(),
                 matching.getFemaleMember().getResidenceArea(),
+                matching.getFemaleMember().getAiSummary() != null 
+                ? matching.getFemaleMember().getAiSummary() 
+                : null,  // null 처리
                 matching.getStatus(),
                 matching.getCreatedAt()
         );

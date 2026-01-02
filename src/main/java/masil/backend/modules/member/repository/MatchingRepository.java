@@ -33,9 +33,17 @@ public interface MatchingRepository extends JpaRepository<Matching, Long> {
     // 특정 남성의 수락 대기 중인 매칭 조회
     List<Matching> findByMaleMemberIdAndStatus(Long maleMemberId, MatchingStatus status);
     
+    // 특정 남성의 수락 대기 중인 매칭 조회 (여성 정보 fetch join으로 함께 조회)
+    @Query("SELECT m FROM Matching m JOIN FETCH m.femaleMember WHERE m.maleMember.id = :maleMemberId AND m.status = :status")
+    List<Matching> findByMaleMemberIdAndStatusWithFemaleMember(
+            @Param("maleMemberId") Long maleMemberId, 
+            @Param("status") MatchingStatus status
+    );
+    
     // 특정 여성의 선택된 매칭 조회 (수락 대기 또는 수락됨)
     @Query("SELECT m FROM Matching m WHERE m.femaleMember.id = :femaleMemberId " +
            "AND m.status IN :statuses ORDER BY m.matchingOrder")
     List<Matching> findByFemaleMemberIdAndStatusIn(@Param("femaleMemberId") Long femaleMemberId, 
                                                     @Param("statuses") List<MatchingStatus> statuses);
+
 }
