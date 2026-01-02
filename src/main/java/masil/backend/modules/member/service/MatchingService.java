@@ -90,8 +90,8 @@ public class MatchingService {
             throw new IllegalArgumentException("한국 남성 유저만 매칭 알림을 조회할 수 있습니다.");
         }
         
-        // 수락 대기 중인 매칭 조회
-        List<Matching> matchings = matchingRepository.findByMaleMemberIdAndStatus(
+        // 수락 대기 중인 매칭 조회 (여성 정보 fetch join으로 함께 조회)
+        List<Matching> matchings = matchingRepository.findByMaleMemberIdAndStatusWithFemaleMember(
                 maleMemberId,
                 MatchingStatus.PENDING_MALE_ACCEPTANCE
         );

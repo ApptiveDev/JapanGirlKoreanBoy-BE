@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import masil.backend.modules.member.dto.response.MatchedMemberListResponse;
 import masil.backend.modules.member.repository.MatchingRepository;
+import masil.backend.modules.member.entity.Matching;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -121,22 +123,27 @@ public class AdminMemberService {
             throw new IllegalArgumentException("일본 여성 유저만 매칭 후보를 조회할 수 있습니다.");
         }
         
-        // 연결중 상태 남성 유저 조회
-        List<Member> maleMembers = memberRepository.findByGenderAndStatus(
+        // APPROVED 또는 CONNECTING 상태 남성 유저 조회 (이미 매칭된 남성도 포함)
+        List<Member> maleMembers = memberRepository.findByGenderAndStatusIn(
                 Gender.KOREAN_MALE,
-                MemberStatus.APPROVED
+                List.of(MemberStatus.APPROVED, MemberStatus.CONNECTING)
         );
         
-        log.info("매칭 후보 조회: 여성 memberId={}, 남성 후보 수={}", femaleMemberId, maleMembers.size());
+        log.info("매칭 후보 조회: 여성 memberId={}, 남성 후보 수={} (APPROVED 및 CONNECTING 상태)", 
+                femaleMemberId, maleMembers.size());
         
         // 매칭 점수 계산 및 정렬
         return maleMembers.stream()
-                .map(male -> {
-                    Double score = matchingScoreService.calculateMatchingScore(femaleMember, male);
-                    return MatchingScoreResponse.from(male, score);
-                })
-                .sorted((a, b) -> Double.compare(b.matchingScore(), a.matchingScore())) // 내림차순
-                .collect(Collectors.toList());
+        .map(male -> {
+            Double score = matchingScoreService.calculateMatchingScore(femaleMember, male);
+            
+            // 해당 남성의 매칭 정보 조회
+            List<Matching> matchings = matchingRepository.findByMaleMemberId(male.getId());
+            int matchingCount = matchings.size();
+            return MatchingScoreResponse.from(male, score, matchingCount);
+        })
+        .sorted((a, b) -> Double.compare(b.matchingScore(), a.matchingScore())) // 내림차순
+        .collect(Collectors.toList());
     }
     
 
@@ -162,7 +169,7 @@ public class AdminMemberService {
         List<Member> maleMembers = request.maleMemberIds().stream()
                 .map(memberLowService::getValidateExistMemberById)
                 .peek(member -> {
-                    if (member.getStatus() != MemberStatus.APPROVED) {
+                    if (member.getStatus() != MemberStatus.APPROVED && member.getStatus() != MemberStatus.CONNECTING) {
                         throw new IllegalArgumentException(
                                 String.format("선택한 유저 중 매칭 불가 상태가 있습니다. (memberId: %d, 상태: %s)", 
                                         member.getId(), member.getStatus()));
@@ -186,8 +193,11 @@ public class AdminMemberService {
         
         // 상태 변경: 승인완료 -> 연결중
         femaleMember.changeToConnecting();
-        maleMembers.forEach(Member::changeToConnecting);
-        
+        maleMembers.forEach(member -> {
+            if (member.getStatus() == MemberStatus.APPROVED) {
+                member.changeToConnecting();
+            }
+        });        
         // 매칭 테이블에 기록 생성
         for (int i = 0; i < maleMembers.size(); i++) {
             Matching matching = Matching.builder()

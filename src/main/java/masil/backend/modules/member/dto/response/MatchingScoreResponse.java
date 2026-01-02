@@ -1,6 +1,9 @@
 package masil.backend.modules.member.dto.response;
 
 import masil.backend.modules.member.entity.Member;
+import masil.backend.modules.member.enums.MatchingStatus;
+
+import java.util.List;
 
 public record MatchingScoreResponse(
         Long memberId,
@@ -9,9 +12,10 @@ public record MatchingScoreResponse(
         Integer height,
         Integer weight,
         String residenceArea,
-        Double matchingScore
+        Double matchingScore,
+        Integer matchingCount             // 현재 매칭된 개수
 ) {
-    public static MatchingScoreResponse from(Member member, Double score) {
+    public static MatchingScoreResponse from(Member member, Double score, Integer matchingCount) {
         return new MatchingScoreResponse(
                 member.getId(),
                 member.getName(),
@@ -19,7 +23,8 @@ public record MatchingScoreResponse(
                 member.getHeight(),
                 member.getWeight(),
                 member.getResidenceArea(),
-                score
+                score,
+                matchingCount
         );
     }
 }

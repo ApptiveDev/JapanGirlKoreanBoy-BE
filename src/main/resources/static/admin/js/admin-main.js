@@ -447,6 +447,11 @@ function renderMatchingCandidates(candidates) {
             <td>${candidate.weight || '-'} kg</td>
             <td>${candidate.residenceArea || '-'}</td>
             <td>
+                <span class="badge" style="background: ${candidate.matchingCount > 0 ? '#4299e1' : '#a0aec0'}; color: white; padding: 4px 12px; border-radius: 12px; font-weight: 600;">
+                    ${candidate.matchingCount || 0}개
+                </span>
+            </td>
+            <td>
                 <span class="score-badge" style="background: ${getScoreColor(candidate.matchingScore)}; color: white; padding: 4px 12px; border-radius: 12px; font-weight: 600;">
                     ${candidate.matchingScore.toFixed(1)}점
                 </span>
