@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import masil.backend.global.security.annotation.LoginMember;
 import masil.backend.global.security.dto.MemberDetails;
 import masil.backend.modules.member.dto.response.FemaleMatchingListResponse;
-import masil.backend.modules.member.dto.response.MaleMatchingNotificationResponse;
+import masil.backend.modules.member.dto.response.MalePendingMatchingResponse;
 import masil.backend.modules.member.service.MatchingService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,14 +42,14 @@ public class MatchingController {
         return ResponseEntity.ok().build();
     }
 
-    //남성에게 매칭 알림 조회 (수락 대기 중인 매칭)
-    @GetMapping("/male/notifications")
-    public ResponseEntity<List<MaleMatchingNotificationResponse>> getMaleMatchingNotifications(
+    //남성에게 대기 매칭 조회 (수락 대기 중인 매칭)
+    @GetMapping("/male/pendingMatching")
+    public ResponseEntity<List<MalePendingMatchingResponse>> getMalePendingMatchings(
             @LoginMember MemberDetails memberDetails
     ) {
-        log.info("남성 매칭 알림 조회 요청: memberId={}", memberDetails.memberId());
-        List<MaleMatchingNotificationResponse> notifications = matchingService.getMaleMatchingNotifications(memberDetails.memberId());
-        return ResponseEntity.ok(notifications);
+        log.info("남성 대기 매칭 조회 요청: memberId={}", memberDetails.memberId());
+        List<MalePendingMatchingResponse> pendingMatchings = matchingService.getMalePendingMatchings(memberDetails.memberId());
+        return ResponseEntity.ok(pendingMatchings);
     }
     
 
