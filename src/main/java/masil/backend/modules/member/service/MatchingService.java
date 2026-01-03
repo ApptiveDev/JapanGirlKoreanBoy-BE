@@ -77,7 +77,7 @@ public class MatchingService {
             }
         });
         
-        // 선택된 남성에게 푸시 알림 전송
+        // 선택된 남성에게 푸시 알림 전송 (수락 대기 중인 매칭 추가가)
         Member selectedMale = selectedMatching.getMaleMember();
         if (selectedMale.getFcmToken() != null && !selectedMale.getFcmToken().isBlank()) {
             String title = "매칭 알림";
@@ -87,9 +87,9 @@ public class MatchingService {
                     selectedMale.getId(), femaleMemberId);
         }
         
-        log.info("여성이 남성 선택: femaleMemberId={}, matchingId={}, selectedMaleId={}, 거절된 매칭 수={}", 
-                femaleMemberId, matchingId, selectedMatching.getMaleMember().getId(), 
-                otherMatchings.size() - 1);
+        log.info("여성이 남성 선택: femaleMemberId={}, matchingId={}, selectedMaleId={}", 
+                femaleMemberId, matchingId, selectedMatching.getMaleMember().getId() 
+        );
     }
     
     //남성에게 대기 매칭 조회 (수락 대기 중인 매칭)
