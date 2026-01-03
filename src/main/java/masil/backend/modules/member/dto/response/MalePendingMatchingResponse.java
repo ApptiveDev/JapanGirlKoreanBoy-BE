@@ -5,7 +5,7 @@ import masil.backend.modules.member.enums.MatchingStatus;
 
 import java.time.LocalDateTime;
 
-public record MaleMatchingNotificationResponse(
+public record MalePendingMatchingResponse(
         Long matchingId,
         Long femaleMemberId,
         String femaleName,
@@ -17,8 +17,8 @@ public record MaleMatchingNotificationResponse(
         MatchingStatus status,
         LocalDateTime createdAt
 ) {
-    public static MaleMatchingNotificationResponse from(Matching matching) {
-        return new MaleMatchingNotificationResponse(
+    public static MalePendingMatchingResponse from(Matching matching) {
+        return new MalePendingMatchingResponse(
                 matching.getId(),
                 matching.getFemaleMember().getId(),
                 matching.getFemaleMember().getName(),

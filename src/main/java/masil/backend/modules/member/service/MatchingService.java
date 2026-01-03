@@ -3,7 +3,7 @@ package masil.backend.modules.member.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import masil.backend.modules.member.dto.response.FemaleMatchingListResponse;
-import masil.backend.modules.member.dto.response.MaleMatchingNotificationResponse;
+import masil.backend.modules.member.dto.response.MalePendingMatchingResponse;
 import masil.backend.modules.member.entity.Matching;
 import masil.backend.modules.member.entity.Member;
 import masil.backend.modules.member.enums.Gender;
@@ -11,6 +11,7 @@ import masil.backend.modules.member.enums.MatchingStatus;
 import masil.backend.modules.member.repository.MatchingRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import masil.backend.modules.member.service.FcmService;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class MatchingService {
     
     private final MatchingRepository matchingRepository;
     private final MemberLowService memberLowService;
+    private final FcmService fcmService;
     
     
     //여성에게 매칭된 남성 목록 조회
@@ -75,19 +77,29 @@ public class MatchingService {
             }
         });
         
+        // 선택된 남성에게 푸시 알림 전송
+        Member selectedMale = selectedMatching.getMaleMember();
+        if (selectedMale.getFcmToken() != null && !selectedMale.getFcmToken().isBlank()) {
+            String title = "매칭 알림";
+            String body = String.format("%s님이 당신을 선택했습니다. 수락하시겠습니까?", femaleMember.getName());
+            fcmService.sendPushNotification(selectedMale.getFcmToken(), title, body);
+            log.info("매칭 선택 푸시 알림 전송: maleMemberId={}, femaleMemberId={}", 
+                    selectedMale.getId(), femaleMemberId);
+        }
+        
         log.info("여성이 남성 선택: femaleMemberId={}, matchingId={}, selectedMaleId={}, 거절된 매칭 수={}", 
                 femaleMemberId, matchingId, selectedMatching.getMaleMember().getId(), 
                 otherMatchings.size() - 1);
     }
     
-    //남성에게 매칭 알림 조회 (수락 대기 중인 매칭)
+    //남성에게 대기 매칭 조회 (수락 대기 중인 매칭)
     @Transactional(readOnly = true)
-    public List<MaleMatchingNotificationResponse> getMaleMatchingNotifications(Long maleMemberId) {
+    public List<MalePendingMatchingResponse> getMalePendingMatchings(Long maleMemberId) {
         // 남성 유저 검증
         Member maleMember = memberLowService.getValidateExistMemberById(maleMemberId);
         
         if (maleMember.getGender() != Gender.KOREAN_MALE) {
-            throw new IllegalArgumentException("한국 남성 유저만 매칭 알림을 조회할 수 있습니다.");
+            throw new IllegalArgumentException("한국 남성 유저만 대기 매칭을 조회할 수 있습니다.");
         }
         
         // 수락 대기 중인 매칭 조회 (여성 정보 fetch join으로 함께 조회)
@@ -96,10 +108,10 @@ public class MatchingService {
                 MatchingStatus.PENDING_MALE_ACCEPTANCE
         );
         
-        log.info("남성 매칭 알림 조회: maleMemberId={}, 알림 수={}", maleMemberId, matchings.size());
+        log.info("남성 대기 매칭 조회: maleMemberId={}, 수락대기 매칭 수={}", maleMemberId, matchings.size());
         
         return matchings.stream()
-                .map(MaleMatchingNotificationResponse::from)
+                .map(MalePendingMatchingResponse::from)
                 .toList();
     }
     
