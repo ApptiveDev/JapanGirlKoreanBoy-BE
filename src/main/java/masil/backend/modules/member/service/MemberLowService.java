@@ -9,6 +9,7 @@ import masil.backend.modules.member.enums.Asset;
 import masil.backend.modules.member.enums.DrinkingFrequency;
 import masil.backend.modules.member.enums.Education;
 import masil.backend.modules.member.enums.Gender;
+import masil.backend.modules.member.enums.MemberStatus;
 import masil.backend.modules.member.enums.Provider;
 import masil.backend.modules.member.dto.response.OAuth2UserInfo;
 import masil.backend.modules.member.enums.Religion;

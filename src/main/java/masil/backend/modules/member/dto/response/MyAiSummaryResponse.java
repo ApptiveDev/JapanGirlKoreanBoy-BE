@@ -2,16 +2,16 @@ package masil.backend.modules.member.dto.response;
 
 import masil.backend.modules.member.entity.Member;
 
-public record MyInfoResponse(
+public record MyAiSummaryResponse(
         Long memberId,
         String name,
-        String email
+        String aiSummary
 ) {
-    public MyInfoResponse(final Member member) {
+    public MyAiSummaryResponse(final Member member) {
         this(
                 member.getId(),
                 member.getName(),
-                member.getEmail()
+                member.getAiSummary()
         );
     }
 }

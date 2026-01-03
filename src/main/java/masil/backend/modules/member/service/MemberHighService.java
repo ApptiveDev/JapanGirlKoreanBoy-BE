@@ -6,7 +6,8 @@ import lombok.RequiredArgsConstructor;
 import masil.backend.global.security.provider.JwtProvider;
 import masil.backend.modules.member.dto.request.SignInRequest;
 import masil.backend.modules.member.dto.request.SignUpRequest;
-import masil.backend.modules.member.dto.response.MyInfoResponse;
+import masil.backend.modules.member.dto.response.MyAiSummaryResponse;
+import masil.backend.modules.member.dto.response.MyStatusResponse;
 import masil.backend.modules.member.dto.response.SignInResponse;
 import masil.backend.modules.member.entity.Member;
 import masil.backend.modules.member.exception.MemberException;
@@ -40,10 +41,14 @@ public class MemberHighService {
         return new SignInResponse(member, token, member.getStatus());
     }
 
-    @Transactional(readOnly = true)
-    public MyInfoResponse getMyInfo(final Long memberId) {
+    public MyStatusResponse getMemberStatus(final Long memberId) {
         final Member member = memberLowService.getValidateExistMemberById(memberId);
-        return new MyInfoResponse(member);
+        return new MyStatusResponse(member);
+    }
+
+    public MyAiSummaryResponse getMemberAiSummary(final Long memberId) {
+        final Member member = memberLowService.getValidateExistMemberById(memberId);
+        return new MyAiSummaryResponse(member);
     }
 
     private void checkCorrectPassword(final String savePassword, final String inputPassword) {
