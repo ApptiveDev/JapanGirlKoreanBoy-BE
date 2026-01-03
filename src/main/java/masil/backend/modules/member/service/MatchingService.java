@@ -77,15 +77,8 @@ public class MatchingService {
             }
         });
         
-        // 선택된 남성에게 푸시 알림 전송 (수락 대기 중인 매칭 추가가)
-        Member selectedMale = selectedMatching.getMaleMember();
-        if (selectedMale.getFcmToken() != null && !selectedMale.getFcmToken().isBlank()) {
-            String title = "매칭 알림";
-            String body = String.format("%s님이 당신을 선택했습니다. 수락하시겠습니까?", femaleMember.getName());
-            fcmService.sendPushNotification(selectedMale.getFcmToken(), title, body);
-            log.info("매칭 선택 푸시 알림 전송: maleMemberId={}, femaleMemberId={}", 
-                    selectedMale.getId(), femaleMemberId);
-        }
+        // 상태 변경 후 알림 전송
+        sendNotificationIfStatusChanged(selectedMatching, femaleMember);
         
         log.info("여성이 남성 선택: femaleMemberId={}, matchingId={}, selectedMaleId={}", 
                 femaleMemberId, matchingId, selectedMatching.getMaleMember().getId() 
@@ -210,6 +203,22 @@ public class MatchingService {
         log.info("여성 선택 매칭 상태 조회: femaleMemberId={}, 매칭 수={}", femaleMemberId, matchings.size());
         
         return FemaleMatchingListResponse.fromList(matchings);
+    }
+    
+    //매칭 상태가 PENDING_MALE_ACCEPTANCE로 변경되었을 때 남성에게 푸시 알림 전송 메서드    
+    private void sendNotificationIfStatusChanged(Matching matching, Member femaleMember) {
+        if (matching.getStatus() == MatchingStatus.PENDING_MALE_ACCEPTANCE) {
+            Member maleMember = matching.getMaleMember();
+            if (maleMember.getFcmToken() != null && !maleMember.getFcmToken().isBlank()) {
+                String title = "매칭 알림";
+                String body = String.format("%s님이 당신을 선택했습니다. 수락하시겠습니까?", femaleMember.getName());
+                fcmService.sendPushNotification(maleMember.getFcmToken(), title, body);
+                log.info("매칭 상태 변경 알림 전송: matchingId={}, status={}, maleMemberId={}, femaleMemberId={}", 
+                        matching.getId(), matching.getStatus(), maleMember.getId(), femaleMember.getId());
+            } else {
+                log.warn("FCM 토큰이 없어 알림을 전송할 수 없습니다: maleMemberId={}", maleMember.getId());
+            }
+        }
     }
 }
 
